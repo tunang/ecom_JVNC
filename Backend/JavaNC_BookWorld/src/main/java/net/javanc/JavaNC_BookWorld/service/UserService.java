@@ -10,9 +10,9 @@ import java.util.Random;
 
 public interface UserService {
     List<User> getAllUsers();
-    Optional<User> getUserById(String id);
-    User updateUser(String id, User userDetails);
-    void deleteUser(String id);
+    Optional<User> getUserById(Long id);
+    User updateUser(Long id, User userDetails);
+    void deleteUser(Long id);
     Optional<User> getUserByEmail(String email);
     User registerUser(RegisterRequest request);
     User login(String email, String password);

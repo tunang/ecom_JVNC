@@ -29,7 +29,7 @@ public class UserController {
 
     // Lấy user theo id
     @GetMapping("/{id}")
-    public ResponseEntity<User> getUserById(@PathVariable String id) {
+    public ResponseEntity<User> getUserById(@PathVariable Long id) {
         Optional<User> user = userService.getUserById(id);
         if (user.isPresent()) {
             User u = user.get();
@@ -41,7 +41,7 @@ public class UserController {
 
     // Cập nhật user theo id
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateUser(@PathVariable String id, @RequestBody User userDetails) {
+    public ResponseEntity<?> updateUser(@PathVariable Long id, @RequestBody User userDetails) {
         try {
             User updatedUser = userService.updateUser(id, userDetails);
             updatedUser.setPassword(null);
@@ -53,7 +53,7 @@ public class UserController {
 
     // Xóa user theo id
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteUser(@PathVariable String id) {
+    public ResponseEntity<?> deleteUser(@PathVariable Long id) {
         try {
             userService.deleteUser(id);
             return ResponseEntity.ok("User đã được xóa");
