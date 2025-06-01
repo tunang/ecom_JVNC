@@ -1,9 +1,6 @@
 package net.javanc.JavaNC_BookWorld.model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
 
@@ -11,7 +8,8 @@ import java.time.LocalDateTime;
 @Table(name = "users")
 public class User {
     @Id
-    private String userId;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long userId;
 
     @Column(unique = true, nullable = false)
     private String email;
@@ -34,7 +32,7 @@ public class User {
     private LocalDateTime createdAt = LocalDateTime.now();
 
     public User(){}
-    public User(String userId, String email, String name, String phone, String password, String role, String profilePicture, LocalDateTime createdAt) {
+    public User(Long userId, String email, String name, String phone, String password, String role, String profilePicture, LocalDateTime createdAt) {
         this.userId = userId;
         this.email = email;
         this.name = name;
@@ -45,11 +43,11 @@ public class User {
         this.createdAt = createdAt;
     }
 
-    public String getUserId() {
+    public Long getUserId() {
         return userId;
     }
 
-    public void setUserId(String userId) {
+    public void setUserId(Long userId) {
         this.userId = userId;
     }
 

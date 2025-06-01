@@ -45,8 +45,6 @@ public class UserServiceImpl implements UserService {
 
         existingUser.setName(userDetails.getName());
         existingUser.setPhone(userDetails.getPhone());
-        // Cập nhật các trường khác nếu muốn, lưu ý không cập nhật mật khẩu ở đây
-        // Hoặc có thể thêm cập nhật mật khẩu riêng
 
         return userRepo.save(existingUser);
     }
@@ -63,7 +61,6 @@ public class UserServiceImpl implements UserService {
             throw new RuntimeException("Email đã tồn tại");
         }
         User user = new User();
-        user.setUserId(UUID.randomUUID().toString());
         user.setEmail(request.getEmail());
         user.setName(request.getName());
         user.setPhone(request.getPhone());
@@ -87,6 +84,7 @@ public class UserServiceImpl implements UserService {
         if (!passwordEncoder.matches(rawPassword, user.getPassword())) {
             throw new RuntimeException("Sai mật khẩu");
         }
+
         return user;
     }
     public void sendOtpToEmail(String email) {
@@ -109,7 +107,6 @@ public class UserServiceImpl implements UserService {
         }
 
         User user = new User();
-        user.setUserId(UUID.randomUUID().toString());
         user.setEmail(request.getEmail());
         user.setName(request.getName());
         user.setPhone(request.getPhone());
