@@ -1,6 +1,7 @@
 package net.javanc.JavaNC_BookWorld.controller;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
+import net.javanc.JavaNC_BookWorld.config.JwtUtil;
 import net.javanc.JavaNC_BookWorld.dto.*;
 import net.javanc.JavaNC_BookWorld.dto.RegisterRequest;
 import net.javanc.JavaNC_BookWorld.model.User;
@@ -90,8 +91,10 @@ public class UserController {
     public ResponseEntity<?> login(@RequestBody LoginRequest request) {
         try {
             User user = userService.login(request.getEmail(), request.getPassword());
+            String token = JwtUtil.generateToken(user.getEmail(), user.getRole());
             user.setPassword(null);
-            return ResponseEntity.ok(user);
+
+            return ResponseEntity.ok(new LoginResponse(user, token));
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
         }
