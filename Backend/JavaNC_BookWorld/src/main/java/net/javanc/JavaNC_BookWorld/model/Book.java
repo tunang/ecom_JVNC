@@ -9,7 +9,8 @@ import java.time.LocalDateTime;
 @Table(name = "books")
 public class Book {
     @Id
-    private String bookId;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long bookId;
 
     private String title;
     private String author;
@@ -29,8 +30,8 @@ public class Book {
 
     @Column(name = "created_at")
     private LocalDateTime createdAt = LocalDateTime.now();
-
-    public Book(String bookId, String title, String author, String description, BigDecimal price, Integer stock, String imageUrl, Genre genre, LocalDateTime createdAt) {
+    public Book(){}
+    public Book(Long bookId, String title, String author, String description, BigDecimal price, Integer stock, String imageUrl, Genre genre, LocalDateTime createdAt) {
         this.bookId = bookId;
         this.title = title;
         this.author = author;
@@ -42,11 +43,11 @@ public class Book {
         this.createdAt = createdAt;
     }
 
-    public String getBookId() {
+    public Long getBookId() {
         return bookId;
     }
 
-    public void setBookId(String bookId) {
+    public void setBookId(Long bookId) {
         this.bookId = bookId;
     }
 

@@ -34,12 +34,12 @@ public class UserServiceImpl implements UserService {
         return userRepo.findByEmail(email);
     }
     @Override
-    public Optional<User> getUserById(String id) {
+    public Optional<User> getUserById(Long id) {
         return userRepo.findById(id);
     }
 
     @Override
-    public User updateUser(String id, User userDetails) {
+    public User updateUser(Long id, User userDetails) {
         User existingUser = userRepo.findById(id)
                 .orElseThrow(() -> new RuntimeException("User không tồn tại"));
 
@@ -50,7 +50,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void deleteUser(String id) {
+    public void deleteUser(Long id) {
         User user = userRepo.findById(id)
                 .orElseThrow(() -> new RuntimeException("User không tồn tại"));
         userRepo.delete(user);

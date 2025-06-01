@@ -20,8 +20,8 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public Optional<Book> getBookById(String id) {
-        return bookRepo.findById(id);
+    public Optional<Book> getBookById(Long bookId) {
+        return bookRepo.findById(bookId);
     }
 
     @Override
@@ -30,8 +30,8 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public Book updateBook(String id, Book updated) {
-        return bookRepo.findById(id).map(book -> {
+    public Book updateBook(Long bookId, Book updated) {
+        return bookRepo.findById(bookId).map(book -> {
             book.setTitle(updated.getTitle());
             book.setAuthor(updated.getAuthor());
             book.setDescription(updated.getDescription());
@@ -43,7 +43,7 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public void deleteBook(String id) {
-        bookRepo.deleteById(id);
+    public void deleteBook(Long bookId) {
+        bookRepo.deleteById(bookId);
     }
 }
