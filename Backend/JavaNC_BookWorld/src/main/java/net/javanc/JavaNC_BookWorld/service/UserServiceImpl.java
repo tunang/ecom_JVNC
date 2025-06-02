@@ -42,7 +42,9 @@ public class UserServiceImpl implements UserService {
     public User updateUser(Long id, User userDetails) {
         User existingUser = userRepo.findById(id)
                 .orElseThrow(() -> new RuntimeException("User không tồn tại"));
-
+        if ("Admin".equals(userDetails.getRole())) {
+            throw new RuntimeException("Không thể sửa tài khoản Admin");
+        }
         existingUser.setName(userDetails.getName());
         existingUser.setPhone(userDetails.getPhone());
 
@@ -53,6 +55,9 @@ public class UserServiceImpl implements UserService {
     public void deleteUser(Long id) {
         User user = userRepo.findById(id)
                 .orElseThrow(() -> new RuntimeException("User không tồn tại"));
+        if ("Admin".equals(user.getRole())) {
+            throw new RuntimeException("Không thể xóa tài khoản Admin");
+        }
         userRepo.delete(user);
     }
     @Override
