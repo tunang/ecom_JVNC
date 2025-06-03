@@ -1,4 +1,5 @@
 package net.javanc.JavaNC_BookWorld.config;
+import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -13,15 +14,15 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.regex.Pattern;
 
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
-
+    private static final Pattern JWT_PATTERN = Pattern.compile("^[A-Za-z0-9-_]+\\.[A-Za-z0-9-_]+\\.[A-Za-z0-9-_]+$");
     @Override
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
-
         String authHeader = request.getHeader("Authorization");
 
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
@@ -31,25 +32,38 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         String token = authHeader.substring(7);
 
-        if (!JwtUtil.validateToken(token)) {
-            filterChain.doFilter(request, response);
+        if (token.isBlank() || !JWT_PATTERN.matcher(token).matches()) {
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid JWT token format");
             return;
         }
 
-        String email = JwtUtil.extractSubject(token);
-        String role = JwtUtil.extractRole(token);
+        try {
+            if (!JwtUtil.validateToken(token)) {
+                throw new JwtException("Token không hợp lệ");
+            }
 
-        if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            List<SimpleGrantedAuthority> authorities = List.of(new SimpleGrantedAuthority(role));
+            String email = JwtUtil.extractSubject(token);
+            String role = JwtUtil.extractRole(token);
 
-            UsernamePasswordAuthenticationToken authentication =
-                    new UsernamePasswordAuthenticationToken(email, null, authorities);
+            if (email == null || role == null) {
+                throw new JwtException("Không lấy được thông tin từ token");
+            }
 
-            authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+            if (SecurityContextHolder.getContext().getAuthentication() == null) {
+                List<SimpleGrantedAuthority> authorities = List.of(new SimpleGrantedAuthority(role));
 
-            // Tùy chọn: set attribute để controller dễ kiểm tra
-            request.setAttribute("isAdmin", "ADMIN".equalsIgnoreCase(role));
+                UsernamePasswordAuthenticationToken authentication =
+                        new UsernamePasswordAuthenticationToken(email, null, authorities);
+
+                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+                request.setAttribute("isAdmin", "ADMIN".equalsIgnoreCase(role));
+            }
+
+        } catch (JwtException | IllegalArgumentException ex) {
+            SecurityContextHolder.clearContext();
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid or expired JWT token");
+            return;
         }
 
         filterChain.doFilter(request, response);
