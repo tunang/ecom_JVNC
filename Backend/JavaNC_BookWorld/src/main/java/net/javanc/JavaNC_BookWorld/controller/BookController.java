@@ -1,8 +1,8 @@
 package net.javanc.JavaNC_BookWorld.controller;
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import net.javanc.JavaNC_BookWorld.model.Book;
-import net.javanc.JavaNC_BookWorld.repository.BookRepository;
 import net.javanc.JavaNC_BookWorld.service.BookService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -18,30 +18,38 @@ public class BookController {
     @Autowired
     private BookService bookService;
 
+    // Public - Xem tất cả sách
     @GetMapping
     public List<Book> getAllBooks() {
         return bookService.getAllBooks();
     }
 
-    @GetMapping("/{id}")
+    // Public - Xem chi tiết sách
+    @GetMapping("/{bookId}")
     public ResponseEntity<Book> getBook(@PathVariable Long bookId) {
         return bookService.getBookById(bookId)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    //Thêm sách
+    @SecurityRequirement(name = "bearerAuth")
     @PostMapping
     public Book addBook(@RequestBody Book book) {
         return bookService.saveBook(book);
     }
 
-    @PutMapping("/{id}")
+    //Cập nhật sách
+    @SecurityRequirement(name = "bearerAuth")
+    @PutMapping("/{bookId}")
     public ResponseEntity<Book> updateBook(@PathVariable Long bookId, @RequestBody Book updatedBook) {
         Book updated = bookService.updateBook(bookId, updatedBook);
         return updated != null ? ResponseEntity.ok(updated) : ResponseEntity.notFound().build();
     }
 
-    @DeleteMapping("/{id}")
+    //Xóa sách
+    @SecurityRequirement(name = "bearerAuth")
+    @DeleteMapping("/{bookId}")
     public ResponseEntity<Void> deleteBook(@PathVariable Long bookId) {
         bookService.deleteBook(bookId);
         return ResponseEntity.noContent().build();

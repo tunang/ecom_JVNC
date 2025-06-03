@@ -40,8 +40,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String role = JwtUtil.extractRole(token);
 
         if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            // Tạo authorities dựa trên role, ví dụ: ROLE_ADMIN hoặc ROLE_USER
-            List<SimpleGrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("ROLE_" + role.toUpperCase()));
+            List<SimpleGrantedAuthority> authorities = List.of(new SimpleGrantedAuthority(role));
 
             UsernamePasswordAuthenticationToken authentication =
                     new UsernamePasswordAuthenticationToken(email, null, authorities);

@@ -1,5 +1,6 @@
 package net.javanc.JavaNC_BookWorld.controller;
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import net.javanc.JavaNC_BookWorld.model.CartItem;
 import net.javanc.JavaNC_BookWorld.service.CartItemService;
 import org.springframework.http.ResponseEntity;
@@ -9,6 +10,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/cart-items")
+@SecurityRequirement(name = "bearerAuth")
 public class CartItemController {
 
     private final CartItemService cartItemService;

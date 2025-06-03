@@ -1,5 +1,6 @@
 package net.javanc.JavaNC_BookWorld.controller;
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import net.javanc.JavaNC_BookWorld.config.JwtUtil;
 import net.javanc.JavaNC_BookWorld.dto.*;
@@ -22,12 +23,14 @@ public class UserController {
     @Autowired
     private UserService userService;
 
+    @SecurityRequirement(name = "bearerAuth")
     @GetMapping
     public List<User> getAllUsers() {
         return userService.getAllUsers();
     }
 
     // Lấy user theo id
+    @SecurityRequirement(name = "bearerAuth")
     @GetMapping("/{id}")
     public ResponseEntity<User> getUserById(@PathVariable Long id) {
         Optional<User> user = userService.getUserById(id);
@@ -40,6 +43,7 @@ public class UserController {
     }
 
     // Cập nhật user theo id
+    @SecurityRequirement(name = "bearerAuth")
     @PutMapping("/{id}")
     public ResponseEntity<?> updateUser(@PathVariable Long id, @RequestBody User userDetails) {
         try {
@@ -52,6 +56,7 @@ public class UserController {
     }
 
     // Xóa user theo id
+    @SecurityRequirement(name = "bearerAuth")
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteUser(@PathVariable Long id) {
         try {
