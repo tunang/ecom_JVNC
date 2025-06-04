@@ -5,13 +5,13 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import net.javanc.JavaNC_BookWorld.config.JwtUtil;
 import net.javanc.JavaNC_BookWorld.dto.*;
-import net.javanc.JavaNC_BookWorld.dto.RegisterRequest;
 import net.javanc.JavaNC_BookWorld.model.RevokedToken;
 import net.javanc.JavaNC_BookWorld.model.User;
 import net.javanc.JavaNC_BookWorld.repository.RevokedTokenRepository;
 import net.javanc.JavaNC_BookWorld.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -32,7 +32,7 @@ public class UserController {
     @Autowired
     private RevokedTokenRepository revokedTokenRepo;
 
-    @PreAuthorize("hasRole('Admin')")
+    @PreAuthorize("hasAuthority('Admin')")
     @SecurityRequirement(name = "bearerAuth")
     @GetMapping
     public ResponseEntity<?> getAllUsers() {
@@ -47,8 +47,7 @@ public class UserController {
         return ResponseEntity.ok(response);
     }
 
-    // Lấy user theo id
-    @PreAuthorize("hasRole('Admin')")
+    @PreAuthorize("hasAuthority('Admin')")
     @SecurityRequirement(name = "bearerAuth")
     @GetMapping("/{id}")
     public ResponseEntity<User> getUserById(@PathVariable Long id) {
@@ -61,31 +60,31 @@ public class UserController {
         return ResponseEntity.notFound().build();
     }
 
-    // Cập nhật user theo id
-    @PreAuthorize("hasRole('Admin')")
+    @PreAuthorize("hasAuthority('Admin')")
     @SecurityRequirement(name = "bearerAuth")
-    @PutMapping("/{id}")
-    public ResponseEntity<?> updateUser(@PathVariable Long id, @RequestBody User userDetails) {
-        String requesterEmail = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Optional<User> requesterOpt = userService.getUserByEmail(requesterEmail);
-
-        if (requesterOpt.isEmpty()) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-
-        User requester = requesterOpt.get();
-        if (!requester.getRole().equals("ADMIN") && !requester.getUserId().equals(id)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Bạn không có quyền cập nhật user này");
-        }
+    @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> updateUserByAdmin(
+            @PathVariable Long id,
+            @ModelAttribute UserUpdateDTO userDetails) {
 
         try {
-            User updatedUser = userService.updateUser(id, userDetails);
+            System.out.println("Updating user with ID: " + id);
+            System.out.println("User details: " + userDetails);
+            boolean hasNewImage = userDetails.getProfilePicture() != null && !userDetails.getProfilePicture().isEmpty();
+            System.out.println("Image present: " + hasNewImage);
+
+            User updatedUser = userService.updateUserByAdmin(id, userDetails);
             return ResponseEntity.ok(toUserResponse(updatedUser));
-        } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ErrorResponse("Internal server error", "An unexpected error occurred"));
         }
     }
 
-    // Xóa user theo id
-    @PreAuthorize("hasRole('Admin')")
+
+    @PreAuthorize("hasAuthority('Admin')")
     @SecurityRequirement(name = "bearerAuth")
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteUser(@PathVariable Long id) {
@@ -93,11 +92,10 @@ public class UserController {
             userService.deleteUser(id);
             return ResponseEntity.ok("User đã được xóa");
         } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }
 
-    // Gửi OTP tới email để xác minh trước khi đăng ký
     @PostMapping("/send-otp")
     public ResponseEntity<?> sendOtp(@RequestBody SendOtpRequest request) {
         try {
@@ -108,27 +106,23 @@ public class UserController {
         }
     }
 
-    // Đăng ký kèm OTP (gộp xác minh OTP + đăng ký)
     @PostMapping("/register")
     public ResponseEntity<?> registerWithOtp(@RequestBody RegisterWithOtpRequest request) {
         try {
-            // Hàm này sẽ kiểm tra OTP rồi mới đăng ký user
             User user = userService.registerUserWithOtp(request.getRegisterRequest(), request.getOtp());
-            user.setPassword(null); // Ẩn mật khẩu trước khi trả về
+            user.setPassword(null);
             return ResponseEntity.ok(user);
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }
 
-    // Đăng nhập
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest request) {
         try {
             User user = userService.login(request.getEmail(), request.getPassword());
             String token = JwtUtil.generateToken(user.getEmail(), user.getRole());
             user.setPassword(null);
-
             return ResponseEntity.ok(new LoginResponse(user, token));
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
@@ -148,6 +142,31 @@ public class UserController {
         }
         return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
+
+    @SecurityRequirement(name = "bearerAuth")
+    @PutMapping(value = "/me", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> updateMyInfo(
+            @ModelAttribute UserUpdateDTO dto) {
+
+        try {
+            String email = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            System.out.println("Updating user profile for email: " + email);
+            System.out.println("User details: " + dto);
+            boolean hasNewImage = dto.getProfilePicture() != null && !dto.getProfilePicture().isEmpty();
+            System.out.println("Image present: " + hasNewImage);
+
+            // Cũng không cần chỉnh sửa DTO, để nguyên
+
+            User updatedUser = userService.updateMyInfo(email, dto);
+            return ResponseEntity.ok(toUserResponse(updatedUser));
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ErrorResponse("Internal server error", "An unexpected error occurred"));
+        }
+    }
+
     @SecurityRequirement(name = "bearerAuth")
     @PostMapping("/logout")
     public ResponseEntity<?> logout(HttpServletRequest request) {
@@ -165,6 +184,7 @@ public class UserController {
         }
         return ResponseEntity.ok("Đăng xuất thành công");
     }
+
     private UserResponseDto toUserResponse(User user) {
         return new UserResponseDto(
                 user.getUserId(),

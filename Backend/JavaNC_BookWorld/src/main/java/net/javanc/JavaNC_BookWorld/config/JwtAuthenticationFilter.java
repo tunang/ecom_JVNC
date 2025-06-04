@@ -57,7 +57,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authentication);
-                request.setAttribute("isAdmin", "ADMIN".equalsIgnoreCase(role));
+                request.setAttribute("isAdmin", "Admin".equalsIgnoreCase(role));
             }
 
         } catch (JwtException | IllegalArgumentException ex) {

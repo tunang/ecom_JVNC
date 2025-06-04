@@ -2,27 +2,34 @@ package net.javanc.JavaNC_BookWorld.service;
 
 import net.javanc.JavaNC_BookWorld.dto.EmailVerification;
 import net.javanc.JavaNC_BookWorld.dto.RegisterRequest;
+import net.javanc.JavaNC_BookWorld.dto.UserUpdateDTO;
 import net.javanc.JavaNC_BookWorld.model.User;
 import net.javanc.JavaNC_BookWorld.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.*;
-
 
 @Service
 public class UserServiceImpl implements UserService {
 
     @Autowired
     private UserRepository userRepo;
+
+    @Autowired
+    private ImageUploadService imageUploadService;
+
     @Autowired
     private EmailService emailService;
-    private final Map<String, EmailVerification> otpStorage = new HashMap<>();
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    private final Map<String, EmailVerification> otpStorage = new HashMap<>();
 
     @Override
     public List<User> getAllUsers() {
@@ -33,33 +40,83 @@ public class UserServiceImpl implements UserService {
     public Optional<User> getUserByEmail(String email) {
         return userRepo.findByEmail(email);
     }
+
     @Override
     public Optional<User> getUserById(Long id) {
         return userRepo.findById(id);
     }
 
     @Override
-    public User updateUser(Long id, User userDetails) {
-        User existingUser = userRepo.findById(id)
-                .orElseThrow(() -> new RuntimeException("User không tồn tại"));
-        if ("Admin".equals(userDetails.getRole())) {
-            throw new RuntimeException("Không thể sửa tài khoản Admin");
-        }
-        existingUser.setName(userDetails.getName());
-        existingUser.setPhone(userDetails.getPhone());
+    public User updateUserByAdmin(Long id, UserUpdateDTO dto) {
+        User user = userRepo.findById(id)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy người dùng với ID: " + id));
 
-        return userRepo.save(existingUser);
+        // Cập nhật các trường thông tin nếu có dữ liệu
+        if (dto.getName() != null && !dto.getName().trim().isEmpty()) {
+            user.setName(dto.getName().trim());
+        }
+
+        if (dto.getPhone() != null && !dto.getPhone().trim().isEmpty()) {
+            user.setPhone(dto.getPhone().trim());
+        }
+
+        if (dto.getPassword() != null && !dto.getPassword().trim().isEmpty()) {
+            user.setPassword(passwordEncoder.encode(dto.getPassword().trim()));
+        }
+
+        // Xử lý ảnh: chỉ cập nhật nếu upload ảnh mới
+        if (dto.getProfilePicture() != null && !dto.getProfilePicture().isEmpty()) {
+            try {
+                String imageUrl = imageUploadService.uploadImageToFolder(dto.getProfilePicture(), "bookworld/users");
+                user.setProfilePicture(imageUrl);
+            } catch (IOException e) {
+                throw new RuntimeException("Lỗi upload ảnh: " + e.getMessage());
+            }
+        }
+        // Nếu ảnh không gửi hoặc rỗng, giữ nguyên ảnh cũ, không thay đổi gì
+
+        return userRepo.save(user);
+    }
+
+    @Override
+    public User updateMyInfo(String email, UserUpdateDTO dto) {
+        User user = userRepo.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy người dùng"));
+
+        if (dto.getName() != null && !dto.getName().trim().isEmpty()) {
+            user.setName(dto.getName().trim());
+        }
+
+        if (dto.getPhone() != null && !dto.getPhone().trim().isEmpty()) {
+            user.setPhone(dto.getPhone().trim());
+        }
+
+        if (dto.getPassword() != null && !dto.getPassword().trim().isEmpty()) {
+            user.setPassword(passwordEncoder.encode(dto.getPassword().trim()));
+        }
+
+        if (dto.getProfilePicture() != null && !dto.getProfilePicture().isEmpty()) {
+            try {
+                String imageUrl = imageUploadService.uploadImageToFolder(dto.getProfilePicture(), "bookworld/users");
+                user.setProfilePicture(imageUrl);
+            } catch (IOException e) {
+                throw new RuntimeException("Lỗi upload ảnh: " + e.getMessage());
+            }
+        }
+
+        return userRepo.save(user);
     }
 
     @Override
     public void deleteUser(Long id) {
         User user = userRepo.findById(id)
-                .orElseThrow(() -> new RuntimeException("User không tồn tại"));
+                .orElseThrow(() -> new RuntimeException("Người dùng không tồn tại"));
         if ("Admin".equals(user.getRole())) {
             throw new RuntimeException("Không thể xóa tài khoản Admin");
         }
         userRepo.delete(user);
     }
+
     @Override
     public User registerUser(RegisterRequest request) {
         if (userRepo.findByEmail(request.getEmail()).isPresent()) {
@@ -74,10 +131,7 @@ public class UserServiceImpl implements UserService {
         user.setCreatedAt(LocalDateTime.now());
 
         User savedUser = userRepo.save(user);
-
-        // Xóa OTP đã dùng
         otpStorage.remove(request.getEmail());
-
         return savedUser;
     }
 
@@ -92,20 +146,21 @@ public class UserServiceImpl implements UserService {
 
         return user;
     }
+
+    @Override
     public void sendOtpToEmail(String email) {
-        // Tạo OTP
         String otp = String.valueOf(new Random().nextInt(900000) + 100000);
         otpStorage.put(email, new EmailVerification(otp, LocalDateTime.now().plusMinutes(5)));
         emailService.sendOtp(email, otp);
     }
 
-    // Kiểm tra OTP
+    @Override
     public boolean verifyOtp(String email, String otp) {
         EmailVerification ev = otpStorage.get(email);
         return ev != null && ev.getOtp().equals(otp) && ev.getExpiresAt().isAfter(LocalDateTime.now());
     }
 
-    // Đăng ký sau khi xác minh OTP
+    @Override
     public User registerUserWithOtp(RegisterRequest request, String otp) {
         if (!verifyOtp(request.getEmail(), otp)) {
             throw new RuntimeException("Mã OTP không hợp lệ hoặc đã hết hạn.");
