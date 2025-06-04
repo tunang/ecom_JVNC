@@ -6,6 +6,7 @@ import net.javanc.JavaNC_BookWorld.model.Book;
 import net.javanc.JavaNC_BookWorld.service.BookService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -33,6 +34,7 @@ public class BookController {
     }
 
     //Thêm sách
+    @PreAuthorize("hasRole('Admin')")
     @SecurityRequirement(name = "bearerAuth")
     @PostMapping
     public Book addBook(@RequestBody Book book) {
@@ -40,6 +42,7 @@ public class BookController {
     }
 
     //Cập nhật sách
+    @PreAuthorize("hasRole('Admin')")
     @SecurityRequirement(name = "bearerAuth")
     @PutMapping("/{bookId}")
     public ResponseEntity<Book> updateBook(@PathVariable Long bookId, @RequestBody Book updatedBook) {
@@ -48,6 +51,7 @@ public class BookController {
     }
 
     //Xóa sách
+    @PreAuthorize("hasRole('Admin')")
     @SecurityRequirement(name = "bearerAuth")
     @DeleteMapping("/{bookId}")
     public ResponseEntity<Void> deleteBook(@PathVariable Long bookId) {
