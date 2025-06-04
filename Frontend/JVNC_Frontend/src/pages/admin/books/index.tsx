@@ -15,7 +15,6 @@ const Books = () => {
 
     return ( <div>
         <DataTable columns={columns} data={data} />
-
     </div> );
 }
  

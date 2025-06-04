@@ -1,13 +1,13 @@
-import { useState } from 'react'
-import { Button } from './components/ui/button'
-import AppRoutes from './routes'
+import { Provider } from 'react-redux';
+import { store } from './store';
+import AppRoutes from './routes';
 
 function App() {
   return (
-    <div>
+    <Provider store={store}>
       <AppRoutes />
-    </div>
-  )
+    </Provider>
+  );
 }
 
-export default App
+export default App;
