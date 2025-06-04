@@ -26,7 +26,7 @@ public class SecurityConfig {
                         // Public cho swagger, login, register, gửi OTP
                         .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
                         .requestMatchers("/api/users/send-otp", "/api/users/register", "/api/users/login").permitAll()
-
+                        .requestMatchers("/api/users/me").hasAnyAuthority("User", "Admin")
                         // User API
                         .requestMatchers(HttpMethod.GET, "/api/users/**").hasAnyAuthority("Admin")
                         .requestMatchers(HttpMethod.PUT, "/api/users/**").hasAnyAuthority( "Admin")

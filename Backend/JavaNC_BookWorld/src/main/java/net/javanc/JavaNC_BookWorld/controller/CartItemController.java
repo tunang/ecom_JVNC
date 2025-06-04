@@ -4,12 +4,14 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import net.javanc.JavaNC_BookWorld.model.CartItem;
 import net.javanc.JavaNC_BookWorld.service.CartItemService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/cart-items")
+@PreAuthorize("hasRole('Admin')")
 @SecurityRequirement(name = "bearerAuth")
 public class CartItemController {
 
