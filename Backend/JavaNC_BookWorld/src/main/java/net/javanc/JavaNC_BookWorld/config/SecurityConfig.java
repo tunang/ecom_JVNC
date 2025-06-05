@@ -25,7 +25,6 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
                         .requestMatchers("/api/users/send-otp", "/api/users/register", "/api/users/login").permitAll()
-
                         // Thông tin cá nhân
                         .requestMatchers("/api/users/me").hasAnyAuthority("User", "Admin")
 
@@ -36,6 +35,8 @@ public class SecurityConfig {
                         .requestMatchers("/api/cart-items/**").hasAnyAuthority("User", "Admin")
 
                         // Book API
+                        .requestMatchers(HttpMethod.GET, "/api/books/search").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/books/genre/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/books/**").hasAnyAuthority("User", "Admin")
                         .requestMatchers(HttpMethod.POST, "/api/books/**").hasAuthority("Admin")
                         .requestMatchers(HttpMethod.PUT, "/api/books/**").hasAuthority("Admin")

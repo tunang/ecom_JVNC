@@ -12,4 +12,6 @@ public interface BookService {
     Book createBook(BookDTO bookDTO);
     Book updateBook(Long id, BookDTO bookDTO);
     void deleteBook(Long bookId);
+    List<Book> getBooksByGenreId(Long genreId);
+    public List<Book> searchTop5BooksByTitle(String keyword);
 }

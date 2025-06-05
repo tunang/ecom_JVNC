@@ -77,4 +77,14 @@ public class BookServiceImpl implements BookService {
 
         return book;
     }
+
+    @Override
+    public List<Book> getBooksByGenreId(Long genreId) {
+        return bookRepo.findByGenreGenreId(genreId);
+    }
+
+    @Override
+    public List<Book> searchTop5BooksByTitle(String keyword) {
+        return bookRepo.findTop5ByTitleContainingIgnoreCase(keyword);
+    }
 }

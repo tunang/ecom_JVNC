@@ -80,4 +80,22 @@ public class BookController {
             return ResponseEntity.notFound().build();
         }
     }
+
+    @GetMapping("/genre/{genreId}")
+    public ResponseEntity<List<Book>> getBooksByGenre(@PathVariable Long genreId) {
+        List<Book> books = bookService.getBooksByGenreId(genreId);
+        if (books.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(books);
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<List<Book>> searchBooks(@RequestParam String title) {
+        List<Book> books = bookService.searchTop5BooksByTitle(title);
+        if (books.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(books);
+    }
 }
