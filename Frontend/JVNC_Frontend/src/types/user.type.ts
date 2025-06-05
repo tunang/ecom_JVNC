@@ -1,12 +1,12 @@
 export type User = {
-  user_id: number;
+  userId: number;
   email: string;
   name: string;
   phone: string;
   password: string;
   role: string; // typically 'User' or 'Admin', etc.
-  profile_picture: string | null; // nullable since it's optional
-  created_at: string; // or Date if parsed
+  profilePicture: string | null; // nullable since it's optional
+  createdAt: string; // or Date if parsed
 };
 export enum Role {
   USER = 'User',

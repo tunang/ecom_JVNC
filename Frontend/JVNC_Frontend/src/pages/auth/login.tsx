@@ -1,10 +1,9 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 
 import { useForm } from 'react-hook-form';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 import { custom, z } from 'zod';
-
 
 import { useEffect, useState } from 'react';
 
@@ -12,14 +11,14 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { Eye, EyeOff } from 'lucide-react'; // Import icons
+import { Eye, EyeOff, UserPlus } from 'lucide-react'; // Import icons
 import { toast } from 'sonner';
-import { loginRequest } from '@/store/slices/authSlice';
-import { useAppDispatch } from '@/store/hooks';
+import { loginRequest, clearError } from '@/store/slices/authSlice';
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
 
 const formSchema = z.object({
-  email: z.string().min(1, {
-    message: 'Email không được để trống',
+  email: z.string().email({
+    message: 'Email không hợp lệ',
   }),
   password: z.string().min(1, {
     message: 'Mật khẩu không được để trống',
@@ -27,8 +26,8 @@ const formSchema = z.object({
 });
 
 const Login = () => {
-
   const dispatch = useAppDispatch();
+  const { isLoading, error, isAuthenticated } = useAppSelector(state => state.auth);
 
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
@@ -42,17 +41,29 @@ const Login = () => {
     },
   });
 
+  // Navigate to home if login successful
+  useEffect(() => {
+    if (isAuthenticated) {
+      toast.success('Đăng nhập thành công!');
+      navigate('/');
+    }
+  }, [isAuthenticated, navigate]);
+
+  // Show error if login failed
+  useEffect(() => {
+    if (error) {
+      toast.error(error);
+      // Clear error after showing it
+      dispatch(clearError());
+    }
+  }, [error, dispatch]);
 
   async function onSubmit(data: z.infer<typeof formSchema>) {
     try {
       const { email, password } = data;
       dispatch(loginRequest({ email, password }));
-      toast(<div>A custom toast with default styling</div>)
-      setTimeout(() => {
-        navigate('/');
-      }, 1000);
     } catch (error) {
-      toast(<div>A custom toast with default styling</div>)
+      toast.error('Có lỗi xảy ra khi đăng nhập');
     }
   }
 
@@ -74,7 +85,7 @@ const Login = () => {
                     <FormItem>
                       <FormLabel>Email</FormLabel>
                       <FormControl>
-                        <Input placeholder="" {...field} />
+                        <Input placeholder="Nhập email" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -89,7 +100,11 @@ const Login = () => {
                       <FormLabel>Mật khẩu</FormLabel>
                       <FormControl>
                         <div className="relative">
-                          <Input type={showPassword ? 'text' : 'password'} placeholder="" {...field} />
+                          <Input 
+                            type={showPassword ? 'text' : 'password'} 
+                            placeholder="Nhập mật khẩu" 
+                            {...field} 
+                          />
                           <button
                             type="button"
                             className="absolute right-3 top-1/2 -translate-y-1/2"
@@ -107,9 +122,17 @@ const Login = () => {
                     </FormItem>
                   )}
                 />
-                <Button type="submit" disabled={form.formState.isSubmitting} className="w-full">
-                  {form.formState.isSubmitting ? 'Đang đăng nhập...' : 'Đăng nhập'}
+                <Button 
+                  type="submit" 
+                  disabled={isLoading} 
+                  className="w-full"
+                >
+                  {isLoading ? 'Đang đăng nhập...' : 'Đăng nhập'}
                 </Button>
+
+                <Link to="/signup" className="w-full block text-center text-blue-600 hover:underline">
+                  Chưa có tài khoản? Đăng ký
+                </Link>
               </form>
             </Form>
           </CardContent>

@@ -39,7 +39,7 @@ import { Link } from "react-router-dom";
 const items = [
   {
     title: "Home",
-    url: "/admin",
+    url: "/",
     icon: Home,
   },
   {
@@ -58,8 +58,8 @@ const items = [
     icon: User2,
   },
   {
-    title: "Category",
-    url: "/categories",
+    title: "Genre",
+    url: "/admin/genres",
     icon: List,
   },
 ];

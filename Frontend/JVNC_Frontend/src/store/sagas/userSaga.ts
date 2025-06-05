@@ -14,18 +14,17 @@ import {
   deleteUserSuccess,
   deleteUserFailure,
 } from '../slices/userSlice';
-import { api } from '../../services/api.service';
+import { api, apiDefaultUpload } from '../../services/api.service';
 import type { SagaIterator } from 'redux-saga';
+import { ApiConstant } from '@/constants/api.constant';
 
 // Fetch users saga
 function* fetchUsersSaga(action: PayloadAction<{ page?: number; size?: number; search?: string }>):SagaIterator {
   try {
     const { page = 1, size = 10, search = '' } = action.payload;
     
-    const response: any = yield call(api.get, '/api/users', {
-      params: { page, size, search },
-    });
-
+    const response: any = yield call(api.get, ApiConstant.user.getAll);
+    console.log(response);
     yield put(fetchUsersSuccess({
       users: response.data || response,
       total: response.total || response.length,
@@ -49,25 +48,87 @@ function* fetchUserByIdSaga(action: PayloadAction<number>):SagaIterator {
   }
 }
 
+
+function* createUserSaga(action: PayloadAction<{ user: any }>): SagaIterator {
+  try {
+    const {  user } = action.payload;
+    console.log(user);
+    // Create FormData for multipart/form-data request
+    const formData = new FormData();
+    
+    // Add user fields to FormData
+    if (user.name) formData.append('name', user.name);
+    if (user.phone) formData.append('phone', user.phone);
+    if (user.password) formData.append('password', user.password);
+    if (user.role) formData.append('role', user.role);
+
+    // Handle profile picture
+    if (user.profilePicture) {
+      // If it's a base64 string, convert it to a blob
+      if (typeof user.profilePicture === 'string' && user.profilePicture.startsWith('data:')) {
+        const response = yield call(fetch, user.profilePicture);
+        const blob: Blob = yield call([response, 'blob']);
+        formData.append('profilePicture', blob, 'profile.jpg');
+      }
+    } else if (user.image && user.image instanceof File) {
+      // If it's a File object, use it directly
+      formData.append('profilePicture', user.image);
+    }
+
+    // Use the upload API service with FormData - Axios response
+    const response: any = yield call(apiDefaultUpload.post, `/users/admin-create`, formData);
+    
+    // For Axios response, data is already parsed and available in response.data
+    // Axios automatically throws errors for non-2xx status codes, so no need to check response.ok
+    yield put(updateUserSuccess(response.data));
+  } catch (error: any) {
+    yield put(updateUserFailure(error.message || error.response?.data?.message || 'Lỗi khi cập nhật người dùng'));
+  }
+}
 // Update user saga
-  function* updateUserSaga(action: PayloadAction<{ id: number; user: any }>):SagaIterator {
+function* updateUserSaga(action: PayloadAction<{ id: number; user: any }>): SagaIterator {
   try {
     const { id, user } = action.payload;
+    console.log(user);
+    // Create FormData for multipart/form-data request
+    const formData = new FormData();
     
-    const response: any = yield call(api.put, `/api/users/${id}`, user);
+    // Add user fields to FormData
+    if (user.name) formData.append('name', user.name);
+    if (user.phone) formData.append('phone', user.phone);
+    if (user.password) formData.append('password', user.password);
+    if (user.role) formData.append('role', user.role);
 
-    yield put(updateUserSuccess(response));
+    // Handle profile picture
+    if (user.profilePicture) {
+      // If it's a base64 string, convert it to a blob
+      if (typeof user.profilePicture === 'string' && user.profilePicture.startsWith('data:')) {
+        const response = yield call(fetch, user.profilePicture);
+        const blob: Blob = yield call([response, 'blob']);
+        formData.append('profilePicture', blob, 'profile.jpg');
+      }
+    } else if (user.image && user.image instanceof File) {
+      // If it's a File object, use it directly
+      formData.append('profilePicture', user.image);
+    }
+
+    // Use the upload API service with FormData - Axios response
+    const response: any = yield call(apiDefaultUpload.put, `/users/${id}`, formData);
+    
+    // For Axios response, data is already parsed and available in response.data
+    // Axios automatically throws errors for non-2xx status codes, so no need to check response.ok
+    yield put(updateUserSuccess(response.data));
   } catch (error: any) {
-    yield put(updateUserFailure(error.response?.data?.message || 'Lỗi khi cập nhật người dùng'));
+    yield put(updateUserFailure(error.message || error.response?.data?.message || 'Lỗi khi cập nhật người dùng'));
   }
 }
 
 // Delete user saga
-function* deleteUserSaga(action: PayloadAction<number>): SagaIterator {
+function* deleteUserSaga(action: PayloadAction<{userId: number}>): SagaIterator {
   try {
-    const userId = action.payload;
+    const { userId } = action.payload;
     
-    yield call(api.delete, `/api/users/${userId}`);
+    yield call(api.delete, `/users/${userId}`);
 
     yield put(deleteUserSuccess(userId));
   } catch (error: any) {

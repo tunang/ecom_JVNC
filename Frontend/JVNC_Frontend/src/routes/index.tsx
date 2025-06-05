@@ -1,7 +1,6 @@
 import AdminLayout from "@/layout/adminLayout";
 import MainLayout from "@/layout/mainLayout";
 import Books from "@/pages/admin/books";
-import Categories from "@/pages/admin/categories";
 import Orders from "@/pages/admin/orders";
 import Users from "@/pages/admin/users";
 import Login from "@/pages/auth/login";
@@ -9,6 +8,7 @@ import Signup from "@/pages/auth/signup";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import ProtectedRoute from "./ProtectedRoute";
 import { Role } from "@/types/user.type";
+import Genres from "@/pages/admin/genres";
 
 const router = createBrowserRouter([
 
@@ -42,8 +42,8 @@ const router = createBrowserRouter([
         element: <Books />
       },
       {
-        path: 'categories',
-        element: <Categories />
+        path: 'genres',
+        element: <Genres />
       },
       {
         path: 'orders',

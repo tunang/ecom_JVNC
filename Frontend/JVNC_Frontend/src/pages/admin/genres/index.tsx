@@ -1,19 +1,19 @@
 import TablePage from "@/components/ui/data-table";
 import { columns } from "./columns";
-import { type Book } from "@/types/book.type";
+import { type Genre } from "@/types/genre.type";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { useEffect } from "react";
-import { fetchBooksRequest, createBookRequest } from "@/store/slices/bookSlice";
-import BookModal, { FormSchema } from "./book-modal";
+import { fetchGenresRequest, createGenreRequest } from "@/store/slices/genreSlice";
+import GenreModal, { FormSchema } from "./genre-modal";
 import { toast } from "sonner";
 import type { z } from "zod";
 
-const Books = () => {
-  const { books: data, isLoading, error } = useAppSelector(state => state.book);
+const Genres = () => {
+  const { genres: data, isLoading, error } = useAppSelector(state => state.genre);
   const dispatch = useAppDispatch();
 
   useEffect(() => {
-    dispatch(fetchBooksRequest({ page: 1, size: 10 }));
+    dispatch(fetchGenresRequest({ page: 1, size: 10 }));
   }, [dispatch]);
   
   console.log(data);
@@ -21,25 +21,25 @@ const Books = () => {
   return (
     <div className="container w-full">
       <TablePage 
-        Modal={BookModal} 
+        Modal={GenreModal} 
         modalProps={{
           mode: 'create',
           onSubmit: async (data: z.infer<typeof FormSchema>) => {
             try {
-              dispatch(createBookRequest(data));
-              toast.success('Thêm sách thành công!');
+              dispatch(createGenreRequest({ name: data.name }));
+              toast.success('Thêm thể loại thành công!');
             } catch (error) {
-              toast.error('Thêm sách thất bại!');
+              toast.error('Thêm thể loại thất bại!');
             }
           },
         }}
         columns={columns} 
         data={data} 
-        title="Quản lý sách" 
+        title="Quản lý thể loại" 
         loading={isLoading}
       />
     </div>
   );
 };
 
-export default Books;
+export default Genres;

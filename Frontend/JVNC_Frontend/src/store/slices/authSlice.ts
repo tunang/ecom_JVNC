@@ -15,13 +15,26 @@ const initialState: AuthState = {
   token: localStorage.getItem('token'),
   isLoading: false,
   error: null,
-  isAuthenticated: false,
+  isAuthenticated: !!localStorage.getItem('token'),
 };
 
 const authSlice = createSlice({
   name: 'auth',
   initialState,
   reducers: {
+    // Authentication initialization
+    initializeAuth: (state) => {
+      const token = localStorage.getItem('token');
+      if (token) {
+        state.token = token;
+        state.isAuthenticated = true;
+      }
+    },
+    setAuthUser: (state, action: PayloadAction<User>) => {
+      state.user = action.payload;
+      state.isAuthenticated = true;
+    },
+
     // Login actions
     loginRequest: (state, action: PayloadAction<{ email: string; password: string }>) => {
       state.isLoading = true;
@@ -72,13 +85,22 @@ const authSlice = createSlice({
     },
 
     // Logout action
-    logout: (state) => {
+    logoutRequest: (state) => {
+      state.isLoading = true;
+      state.error = null;
+    },
+    logoutSuccess: (state) => {
       state.user = null;
       state.token = null;
       state.isAuthenticated = false;
+      state.isLoading = false;
       state.error = null;
+      localStorage.removeItem('token');
     },
-
+    logoutFailure: (state, action: PayloadAction<string>) => {
+      state.isLoading = false;
+      state.error = action.payload;
+    },
     // Clear error
     clearError: (state) => {
       state.error = null;
@@ -87,6 +109,8 @@ const authSlice = createSlice({
 });
 
 export const {
+  initializeAuth,
+  setAuthUser,
   loginRequest,
   loginSuccess,
   loginFailure,
@@ -96,7 +120,9 @@ export const {
   sendOtpRequest,
   sendOtpSuccess,
   sendOtpFailure,
-  logout,
+  logoutRequest,
+  logoutSuccess,
+  logoutFailure,
   clearError,
 } = authSlice.actions;
 

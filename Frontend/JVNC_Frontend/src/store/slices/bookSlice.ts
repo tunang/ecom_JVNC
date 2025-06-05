@@ -1,19 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
 import type { PayloadAction } from '@reduxjs/toolkit';
-
-interface Book {
-  id: number;
-  title: string;
-  author: string;
-  isbn: string;
-  price: number;
-  description: string;
-  stock: number;
-  imageUrl?: string;
-  categoryId: number;
-  createdAt: string;
-  updatedAt: string;
-}
+import type { Book } from '../../types/book.type';
 
 interface BookState {
   books: Book[];
@@ -72,13 +59,14 @@ const bookSlice = createSlice({
     },
 
     // Create book actions (Admin only)
-    createBookRequest: (state, action: PayloadAction<Omit<Book, 'id' | 'createdAt' | 'updatedAt'>>) => {
+    createBookRequest: (state, action: PayloadAction<any>) => {
       state.isLoading = true;
       state.error = null;
     },
     createBookSuccess: (state, action: PayloadAction<Book>) => {
       state.isLoading = false;
       state.books.unshift(action.payload);
+      state.totalBooks += 1;
       state.error = null;
     },
     createBookFailure: (state, action: PayloadAction<string>) => {
@@ -87,17 +75,17 @@ const bookSlice = createSlice({
     },
 
     // Update book actions (Admin only)
-    updateBookRequest: (state, action: PayloadAction<{ id: number; book: Partial<Book> }>) => {
+    updateBookRequest: (state, action: PayloadAction<{ id: number; book: any }>) => {
       state.isLoading = true;
       state.error = null;
     },
     updateBookSuccess: (state, action: PayloadAction<Book>) => {
       state.isLoading = false;
-      const index = state.books.findIndex(book => book.id === action.payload.id);
+      const index = state.books.findIndex(book => book.bookId === action.payload.bookId);
       if (index !== -1) {
         state.books[index] = action.payload;
       }
-      if (state.currentBook?.id === action.payload.id) {
+      if (state.currentBook?.bookId === action.payload.bookId) {
         state.currentBook = action.payload;
       }
       state.error = null;
@@ -108,14 +96,15 @@ const bookSlice = createSlice({
     },
 
     // Delete book actions (Admin only)
-    deleteBookRequest: (state, action: PayloadAction<number>) => {
+    deleteBookRequest: (state, action: PayloadAction<{ bookId: number }>) => {
       state.isLoading = true;
       state.error = null;
     },
     deleteBookSuccess: (state, action: PayloadAction<number>) => {
       state.isLoading = false;
-      state.books = state.books.filter(book => book.id !== action.payload);
-      if (state.currentBook?.id === action.payload) {
+      state.books = state.books.filter(book => book.bookId !== action.payload);
+      state.totalBooks -= 1;
+      if (state.currentBook?.bookId === action.payload) {
         state.currentBook = null;
       }
       state.error = null;
