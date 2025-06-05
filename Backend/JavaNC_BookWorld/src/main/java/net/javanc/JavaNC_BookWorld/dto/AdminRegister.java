@@ -1,18 +1,22 @@
 package net.javanc.JavaNC_BookWorld.dto;
 
+import org.springframework.web.multipart.MultipartFile;
+
 public class AdminRegister {
     private String email;
     private String password;
     private String name;
     private String phone;
     private String role;
+    private MultipartFile profilePicture;
     public AdminRegister() {}
-    public AdminRegister(String email, String password, String name, String phone, String role) {
+    public AdminRegister(String email, String password, String name, String phone, String role,MultipartFile profilePicture) {
         this.email = email;
         this.password = password;
         this.name = name;
         this.phone = phone;
         this.role = role;
+        this.profilePicture=profilePicture;
     }
 
     public String getEmail() {
@@ -53,5 +57,13 @@ public class AdminRegister {
 
     public void setRole(String role) {
         this.role = role;
+    }
+
+    public MultipartFile getProfilePicture() {
+        return profilePicture;
+    }
+
+    public void setProfilePicture(MultipartFile profilePicture) {
+        this.profilePicture = profilePicture;
     }
 }

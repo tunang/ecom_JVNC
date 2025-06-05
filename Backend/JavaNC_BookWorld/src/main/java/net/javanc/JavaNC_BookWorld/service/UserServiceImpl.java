@@ -177,26 +177,28 @@ public class UserServiceImpl implements UserService {
         otpStorage.remove(request.getEmail());
         return userRepo.save(user);
     }
+    @Override
     public User createUserByAdmin(AdminRegister request) {
-        // Kiểm tra email đã tồn tại chưa
-        Optional<User> existingUser = userRepo.findByEmail(request.getEmail());
-        if (existingUser.isPresent()) {
+        if (userRepo.findByEmail(request.getEmail()).isPresent()) {
             throw new RuntimeException("Email đã tồn tại");
         }
 
         User user = new User();
         user.setEmail(request.getEmail());
-        user.setPassword(passwordEncoder.encode(request.getPassword())); // Mã hóa mật khẩu
         user.setName(request.getName());
         user.setPhone(request.getPhone());
-
-        // Nếu Admin không muốn cho phép admin khác tạo admin thì ép role luôn là "User"
-        // Hoặc cho phép role từ request nếu admin có quyền
-        user.setRole(request.getRole() == null ? "User" : request.getRole());
-
+        user.setRole(request.getRole());
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setCreatedAt(LocalDateTime.now());
 
-        // Nếu có ảnh đại diện, xử lý ở đây hoặc ở controller/service upload file
+        if (request.getProfilePicture() != null && !request.getProfilePicture().isEmpty()) {
+            try {
+                String imageUrl = imageUploadService.uploadImageToFolder(request.getProfilePicture(), "bookworld/users");
+                user.setProfilePicture(imageUrl);
+            } catch (IOException e) {
+                throw new RuntimeException("Lỗi upload ảnh: " + e.getMessage());
+            }
+        }
 
         return userRepo.save(user);
     }
