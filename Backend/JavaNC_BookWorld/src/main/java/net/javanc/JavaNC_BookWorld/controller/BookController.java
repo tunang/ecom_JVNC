@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import net.javanc.JavaNC_BookWorld.dto.BookDTO;
 import net.javanc.JavaNC_BookWorld.model.Book;
 import net.javanc.JavaNC_BookWorld.service.BookService;
+import net.javanc.JavaNC_BookWorld.service.GenreService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -21,6 +22,9 @@ public class BookController {
 
     @Autowired
     private BookService bookService;
+
+    @Autowired
+    private GenreService genreService;
 
     @GetMapping
     @Operation(summary = "Lấy danh sách tất cả sách")
@@ -83,12 +87,22 @@ public class BookController {
 
     @GetMapping("/genre/{genreId}")
     @Operation(summary = "Lấy sách theo genreId")
-    public ResponseEntity<List<Book>> getBooksByGenre(@PathVariable Long genreId) {
-        List<Book> books = bookService.getBooksByGenreId(genreId);
-        if (books.isEmpty()) {
-            return ResponseEntity.noContent().build();
+    public ResponseEntity<?> getBooksByGenre(@PathVariable Long genreId) {
+        try {
+            // Kiểm tra thể loại có tồn tại không (nếu không trả về 404)
+            if (!genreService.existsById(genreId)) {
+                return ResponseEntity.status(404).body("Thể loại với ID " + genreId + " không tồn tại.");
+            }
+
+            List<Book> books = bookService.getBooksByGenreId(genreId);
+            if (books.isEmpty()) {
+                return ResponseEntity.noContent().build(); // 204 No Content
+            }
+
+            return ResponseEntity.ok(books); // 200 OK
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Lỗi máy chủ: " + e.getMessage()); // 500 Internal Server Error
         }
-        return ResponseEntity.ok(books);
     }
 
     @GetMapping("/search")

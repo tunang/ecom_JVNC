@@ -15,4 +15,6 @@ public interface GenreService {
     Genre updateGenre(Long id, Genre genre);
 
     void deleteGenre(Long id);
+
+    boolean existsById(Long id);
 }

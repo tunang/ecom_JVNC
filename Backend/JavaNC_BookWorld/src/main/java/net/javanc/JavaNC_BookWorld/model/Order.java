@@ -1,5 +1,6 @@
 package net.javanc.JavaNC_BookWorld.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
 import java.math.BigDecimal;
@@ -20,12 +21,13 @@ public class Order {
 
     private BigDecimal totalAmount;
 
-    private String status = "Pending";  // Pending, Paid, Failed
+    private String status = "Pending";
 
     @Column(name = "created_at")
     private LocalDateTime createdAt = LocalDateTime.now();
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
     private List<OrderItem> orderItems = new ArrayList<>();
 
     // Constructor
@@ -82,13 +84,5 @@ public class Order {
         this.orderItems = orderItems;
     }
 
-    // Helper methods to update status
-    public void markPaid() {
-        this.status = "Paid";
-    }
-
-    public void markFailed() {
-        this.status = "Failed";
-    }
 }
 
