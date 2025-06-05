@@ -29,8 +29,8 @@ public class SecurityConfig {
                         .requestMatchers("/api/users/send-otp", "/api/users/register", "/api/users/login").permitAll()
                         // Thông tin cá nhân
                         .requestMatchers("/api/users/me").hasAnyAuthority("User", "Admin")
-
                         // Quản lý người dùng - chỉ Admin
+                        .requestMatchers("/api/users/logout").hasAnyAuthority("User", "Admin")
                         .requestMatchers("/api/users/**").hasAuthority("Admin")
 
                         // Cart-items - người dùng và admin đều được
@@ -49,6 +49,9 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/genres/**").hasAuthority("Admin")
                         .requestMatchers(HttpMethod.PUT, "/api/genres/**").hasAuthority("Admin")
                         .requestMatchers(HttpMethod.DELETE, "/api/genres/**").hasAuthority("Admin")
+
+                        // Order API
+                        .requestMatchers("/api/orders").hasAnyAuthority("User", "Admin")
 
                         // Các route còn lại cần đăng nhập
                         .anyRequest().authenticated()

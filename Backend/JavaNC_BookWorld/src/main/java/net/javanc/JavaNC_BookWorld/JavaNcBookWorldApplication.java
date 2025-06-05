@@ -9,5 +9,4 @@ public class JavaNcBookWorldApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(JavaNcBookWorldApplication.class, args);
 	}
-
 }
