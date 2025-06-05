@@ -1,4 +1,5 @@
 package net.javanc.JavaNC_BookWorld.service;
+import net.javanc.JavaNC_BookWorld.dto.AdminRegister;
 import net.javanc.JavaNC_BookWorld.dto.EmailVerification;
 import net.javanc.JavaNC_BookWorld.dto.RegisterRequest;
 import net.javanc.JavaNC_BookWorld.dto.UserUpdateDTO;
@@ -22,5 +23,6 @@ public interface UserService {
     boolean verifyOtp(String email, String otp);
     User registerUserWithOtp(RegisterRequest request, String otp);
     User updateMyInfo(String email, UserUpdateDTO dto); // Bỏ MultipartFile image
+    User createUserByAdmin(AdminRegister request);
 }
 

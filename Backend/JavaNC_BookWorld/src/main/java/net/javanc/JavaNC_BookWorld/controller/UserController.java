@@ -194,4 +194,16 @@ public class UserController {
                 user.getCreatedAt()
         );
     }
+    @PreAuthorize("hasAuthority('Admin')")
+    @SecurityRequirement(name = "bearerAuth")
+    @PostMapping("/admin-create")
+    public ResponseEntity<?> adminCreateUser(@RequestBody AdminRegister request) {
+        try {
+            User createdUser = userService.createUserByAdmin(request);
+            createdUser.setPassword(null); // Ẩn password khi trả về
+            return ResponseEntity.status(HttpStatus.CREATED).body(toUserResponse(createdUser));
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
+    }
 }
