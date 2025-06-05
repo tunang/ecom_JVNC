@@ -155,8 +155,6 @@ public class UserController {
             boolean hasNewImage = dto.getProfilePicture() != null && !dto.getProfilePicture().isEmpty();
             System.out.println("Image present: " + hasNewImage);
 
-            // Cũng không cần chỉnh sửa DTO, để nguyên
-
             User updatedUser = userService.updateMyInfo(email, dto);
             return ResponseEntity.ok(toUserResponse(updatedUser));
 
