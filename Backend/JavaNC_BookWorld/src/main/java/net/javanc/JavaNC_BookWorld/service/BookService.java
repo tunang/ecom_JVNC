@@ -13,5 +13,5 @@ public interface BookService {
     Book updateBook(Long id, BookDTO bookDTO);
     void deleteBook(Long bookId);
     List<Book> getBooksByGenreId(Long genreId);
-    public List<Book> searchTop5BooksByTitle(String keyword);
+    List<Book> searchBooksByTitle(String keyword);
 }

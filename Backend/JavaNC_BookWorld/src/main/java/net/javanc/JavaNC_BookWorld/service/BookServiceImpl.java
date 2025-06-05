@@ -84,7 +84,7 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public List<Book> searchTop5BooksByTitle(String keyword) {
-        return bookRepo.findTop5ByTitleContainingIgnoreCase(keyword);
+    public List<Book> searchBooksByTitle(String keyword) {
+        return bookRepo.findByTitleContainingIgnoreCase(keyword);
     }
 }

@@ -92,7 +92,7 @@ public class BookController {
 
     @GetMapping("/search")
     public ResponseEntity<List<Book>> searchBooks(@RequestParam String title) {
-        List<Book> books = bookService.searchTop5BooksByTitle(title);
+        List<Book> books = bookService.searchBooksByTitle(title);
         if (books.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
