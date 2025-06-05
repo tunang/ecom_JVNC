@@ -23,7 +23,7 @@ public class OrderItem {
 
     public OrderItem() {}
 
-    // getters and setters
+    // Getter & Setter
 
     public Long getId() {
         return id;

@@ -1,5 +1,6 @@
 package net.javanc.JavaNC_BookWorld.service;
 
+import net.javanc.JavaNC_BookWorld.dto.AdminRegister;
 import net.javanc.JavaNC_BookWorld.dto.EmailVerification;
 import net.javanc.JavaNC_BookWorld.dto.RegisterRequest;
 import net.javanc.JavaNC_BookWorld.dto.UserUpdateDTO;
@@ -174,6 +175,29 @@ public class UserServiceImpl implements UserService {
         user.setRole("User");
         user.setCreatedAt(LocalDateTime.now());
         otpStorage.remove(request.getEmail());
+        return userRepo.save(user);
+    }
+    public User createUserByAdmin(AdminRegister request) {
+        // Kiểm tra email đã tồn tại chưa
+        Optional<User> existingUser = userRepo.findByEmail(request.getEmail());
+        if (existingUser.isPresent()) {
+            throw new RuntimeException("Email đã tồn tại");
+        }
+
+        User user = new User();
+        user.setEmail(request.getEmail());
+        user.setPassword(passwordEncoder.encode(request.getPassword())); // Mã hóa mật khẩu
+        user.setName(request.getName());
+        user.setPhone(request.getPhone());
+
+        // Nếu Admin không muốn cho phép admin khác tạo admin thì ép role luôn là "User"
+        // Hoặc cho phép role từ request nếu admin có quyền
+        user.setRole(request.getRole() == null ? "User" : request.getRole());
+
+        user.setCreatedAt(LocalDateTime.now());
+
+        // Nếu có ảnh đại diện, xử lý ở đây hoặc ở controller/service upload file
+
         return userRepo.save(user);
     }
 }

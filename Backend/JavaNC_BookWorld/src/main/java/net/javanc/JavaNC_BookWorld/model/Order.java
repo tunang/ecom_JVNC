@@ -18,7 +18,8 @@ public class Order {
     private User user;
 
     private BigDecimal totalAmount;
-    private String status = "Pending";
+
+    private String status = "Pending";  // Pending, Paid, Failed
 
     @Column(name = "created_at")
     private LocalDateTime createdAt = LocalDateTime.now();
@@ -26,9 +27,10 @@ public class Order {
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderItem> orderItems = new ArrayList<>();
 
+    // Constructor
     public Order() {}
 
-    // getters and setters
+    // Getter & Setter
 
     public Long getOrderId() {
         return orderId;
@@ -66,4 +68,13 @@ public class Order {
     public void setOrderItems(List<OrderItem> orderItems) {
         this.orderItems = orderItems;
     }
+
+    // Helper methods to update status
+    public void markPaid() {
+        this.status = "Paid";
+    }
+    public void markFailed() {
+        this.status = "Failed";
+    }
 }
+
