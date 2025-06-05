@@ -23,28 +23,31 @@ public class SecurityConfig {
                 .cors(Customizer.withDefaults())
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        // Public cho swagger, login, register, gửi OTP
                         .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
                         .requestMatchers("/api/users/send-otp", "/api/users/register", "/api/users/login").permitAll()
+
+                        // Thông tin cá nhân
                         .requestMatchers("/api/users/me").hasAnyAuthority("User", "Admin")
-                        // User API
-                        .requestMatchers(HttpMethod.GET, "/api/users/**").hasAnyAuthority("Admin")
-                        .requestMatchers(HttpMethod.PUT, "/api/users/**").hasAnyAuthority( "Admin")
-                        .requestMatchers(HttpMethod.DELETE, "/api/users/**").hasAuthority("Admin")
-                        .requestMatchers(HttpMethod.GET, "/api/users").hasAuthority("Admin")
-                        // Cart-item API
+
+                        // Quản lý người dùng - chỉ Admin
+                        .requestMatchers("/api/users/**").hasAuthority("Admin")
+
+                        // Cart-items - người dùng và admin đều được
                         .requestMatchers("/api/cart-items/**").hasAnyAuthority("User", "Admin")
 
                         // Book API
-                        .requestMatchers(HttpMethod.GET, "/api/books/**").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/api/books/**").hasAnyAuthority("User", "Admin")
                         .requestMatchers(HttpMethod.POST, "/api/books/**").hasAuthority("Admin")
                         .requestMatchers(HttpMethod.PUT, "/api/books/**").hasAuthority("Admin")
                         .requestMatchers(HttpMethod.DELETE, "/api/books/**").hasAuthority("Admin")
 
-                        // Genres API
-                        .requestMatchers(HttpMethod.GET, "/api/genres/**").authenticated()
+                        // Genre API
+                        .requestMatchers(HttpMethod.GET, "/api/genres/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/genres/**").hasAuthority("Admin")
+                        .requestMatchers(HttpMethod.PUT, "/api/genres/**").hasAuthority("Admin")
+                        .requestMatchers(HttpMethod.DELETE, "/api/genres/**").hasAuthority("Admin")
 
+                        // Các route còn lại cần đăng nhập
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
