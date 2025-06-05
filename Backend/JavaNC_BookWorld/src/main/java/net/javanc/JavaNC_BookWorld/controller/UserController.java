@@ -196,8 +196,8 @@ public class UserController {
     }
     @PreAuthorize("hasAuthority('Admin')")
     @SecurityRequirement(name = "bearerAuth")
-    @PostMapping("/admin-create")
-    public ResponseEntity<?> adminCreateUser(@RequestBody AdminRegister request) {
+    @PostMapping(value = "/admin-create", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> adminCreateUser(@ModelAttribute AdminRegister request) {
         try {
             User createdUser = userService.createUserByAdmin(request);
             createdUser.setPassword(null); // Ẩn password khi trả về
