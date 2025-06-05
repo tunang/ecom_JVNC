@@ -3,7 +3,8 @@ package net.javanc.JavaNC_BookWorld.dto;
 public class GenreDTO {
     private String name;
 
-    public GenreDTO() {}
+    public GenreDTO() {
+    }
 
     public GenreDTO(String name) {
         this.name = name;

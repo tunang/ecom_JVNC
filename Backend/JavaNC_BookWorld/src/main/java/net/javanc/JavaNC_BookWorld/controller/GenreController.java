@@ -1,5 +1,6 @@
 package net.javanc.JavaNC_BookWorld.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import net.javanc.JavaNC_BookWorld.dto.GenreDTO;
 import net.javanc.JavaNC_BookWorld.model.Genre;
@@ -21,6 +22,7 @@ public class GenreController {
     @PreAuthorize("hasAuthority('Admin')")
     @SecurityRequirement(name = "bearerAuth")
     @PostMapping
+    @Operation(summary = "Tạo genre mới")
     public ResponseEntity<Genre> createGenre(@RequestBody GenreDTO genreDTO) {
         Genre genre = new Genre();
         genre.setName(genreDTO.getName());
@@ -28,6 +30,7 @@ public class GenreController {
     }
 
     @GetMapping("/{id}")
+    @Operation(summary = "Lấy thông tin genre qua id")
     public ResponseEntity<Genre> getGenreById(@PathVariable Long id) {
         return genreService.getGenreById(id)
                 .map(ResponseEntity::ok)
@@ -35,6 +38,7 @@ public class GenreController {
     }
 
     @GetMapping
+    @Operation(summary = "Lấy danh sách tất cả genre")
     public List<Genre> getAllGenres() {
         return genreService.getAllGenres();
     }
@@ -42,6 +46,7 @@ public class GenreController {
     @PreAuthorize("hasAuthority('Admin')")
     @SecurityRequirement(name = "bearerAuth")
     @PutMapping("/{id}")
+    @Operation(summary = "Sửa thông tin genre theo id")
     public ResponseEntity<Genre> updateGenre(@PathVariable Long id, @RequestBody GenreDTO genreDTO) {
         Genre updated = genreService.updateGenre(id, new Genre(null, genreDTO.getName()));
         return ResponseEntity.ok(updated);
@@ -49,6 +54,7 @@ public class GenreController {
 
     @PreAuthorize("hasAuthority('Admin')")
     @SecurityRequirement(name = "bearerAuth")
+    @Operation(summary = "Xóa genre theo id")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteGenre(@PathVariable Long id) {
         genreService.deleteGenre(id);

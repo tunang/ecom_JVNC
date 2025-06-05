@@ -6,10 +6,12 @@ public class EmailVerification {
     private String email;
     private String otp;
     private LocalDateTime expiresAt;
+
     public EmailVerification(String otp, LocalDateTime expiresAt) {
         this.otp = otp;
         this.expiresAt = expiresAt;
     }
+
     public String getEmail() {
         return email;
     }

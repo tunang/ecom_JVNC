@@ -8,12 +8,15 @@ public class RegisterWithOtpRequest {
     public RegisterRequest getRegisterRequest() {
         return registerRequest;
     }
+
     public void setRegisterRequest(RegisterRequest registerRequest) {
         this.registerRequest = registerRequest;
     }
+
     public String getOtp() {
         return otp;
     }
+
     public void setOtp(String otp) {
         this.otp = otp;
     }

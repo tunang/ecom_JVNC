@@ -1,5 +1,6 @@
 package net.javanc.JavaNC_BookWorld.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import net.javanc.JavaNC_BookWorld.dto.CartItemRequest;
 import net.javanc.JavaNC_BookWorld.dto.UpdateQuantityRequest;
@@ -33,6 +34,7 @@ public class CartItemController {
     // Thêm sản phẩm vào giỏ, lấy user từ JWT (email)
     @SecurityRequirement(name = "bearerAuth")
     @PostMapping
+    @Operation(summary = "Thêm vào giỏ hàng")
     public ResponseEntity<?> addToCart(@RequestBody CartItemRequest request) {
         try {
             String email = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -53,6 +55,7 @@ public class CartItemController {
     // Cập nhật số lượng trong giỏ
     @SecurityRequirement(name = "bearerAuth")
     @PutMapping("/{cartItemId}")
+    @Operation(summary = "Cập nhật số lượng trong giỏ")
     public ResponseEntity<?> updateQuantity(@PathVariable Long cartItemId, @RequestBody UpdateQuantityRequest request) {
         try {
             CartItem updated = cartService.updateQuantity(cartItemId, request.getQuantity());
@@ -65,6 +68,7 @@ public class CartItemController {
     // Xóa sản phẩm khỏi giỏ
     @SecurityRequirement(name = "bearerAuth")
     @DeleteMapping("/{cartItemId}")
+    @Operation(summary = "Xóa sản phẩm khỏi giỏ")
     public ResponseEntity<?> removeFromCart(@PathVariable Long cartItemId) {
         try {
             cartService.removeFromCart(cartItemId);
@@ -77,6 +81,7 @@ public class CartItemController {
     // Lấy danh sách giỏ hàng của user hiện tại
     @SecurityRequirement(name = "bearerAuth")
     @GetMapping("/me")
+    @Operation(summary = "Lấy danh sách giỏ hàng của user hiện tại")
     public ResponseEntity<?> getMyCart() {
         try {
             String email = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();

@@ -8,7 +8,10 @@ public class UserUpdateDTO {
     private String phone;
     private String password;
     private MultipartFile profilePicture;
-    public UserUpdateDTO() {}
+
+    public UserUpdateDTO() {
+    }
+
     public UserUpdateDTO(String name, String phone, String password, MultipartFile profilePicture) {
         this.name = name;
         this.phone = phone;
@@ -47,6 +50,7 @@ public class UserUpdateDTO {
     public void setProfilePicture(MultipartFile profilePicture) {
         this.profilePicture = profilePicture;
     }
+
     @Override
     public String toString() {
         return "UserUpdateDTO{name='" + name + "', phone='" + phone + "', password='***', profilePicture=" + (profilePicture != null ? profilePicture.getOriginalFilename() : "null") + "}";
