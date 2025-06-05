@@ -1,14 +1,19 @@
 package net.javanc.JavaNC_BookWorld.dto;
 
 public class CartItemRequest {
-    private String bookId;
+    private Long bookId;
     private int quantity;
+    public CartItemRequest() {}
+    public CartItemRequest(Long bookId, int quantity) {
+        this.bookId = bookId;
+        this.quantity = quantity;
+    }
 
-    public String getBookId() {
+    public Long getBookId() {
         return bookId;
     }
 
-    public void setBookId(String bookId) {
+    public void setBookId(Long bookId) {
         this.bookId = bookId;
     }
 

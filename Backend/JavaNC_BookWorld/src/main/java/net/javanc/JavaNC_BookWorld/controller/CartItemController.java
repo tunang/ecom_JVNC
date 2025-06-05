@@ -1,60 +1,94 @@
 package net.javanc.JavaNC_BookWorld.controller;
 
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import net.javanc.JavaNC_BookWorld.dto.CartItemRequest;
+import net.javanc.JavaNC_BookWorld.dto.UpdateQuantityRequest;
+import net.javanc.JavaNC_BookWorld.model.Book;
 import net.javanc.JavaNC_BookWorld.model.CartItem;
+import net.javanc.JavaNC_BookWorld.model.User;
+import net.javanc.JavaNC_BookWorld.repository.BookRepository;
+import net.javanc.JavaNC_BookWorld.repository.UserRepository;
 import net.javanc.JavaNC_BookWorld.service.CartItemService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/cart-items")
-@PreAuthorize("hasRole('Admin')")
-@SecurityRequirement(name = "bearerAuth")
+@RequestMapping("/api/cart")
 public class CartItemController {
 
-    private final CartItemService cartItemService;
+    private final CartItemService cartService;
+    private final UserRepository userRepository;
+    private final BookRepository bookRepository;
 
-    public CartItemController(CartItemService cartItemService) {
-        this.cartItemService = cartItemService;
+    public CartItemController(CartItemService cartService, UserRepository userRepository, BookRepository bookRepository) {
+        this.cartService = cartService;
+        this.userRepository = userRepository;
+        this.bookRepository = bookRepository;
     }
 
-    // Lấy danh sách tất cả sản phẩm trong giỏ hàng của user
-    @GetMapping("/user/{userId}")
-    public ResponseEntity<List<CartItem>> getCartItemsByUser(@PathVariable Long userId) {
-        return ResponseEntity.ok(cartItemService.getCartItemsByUserId(userId));
-    }
-
-    // Thêm sản phẩm vào giỏ hàng hoặc tăng số lượng nếu đã tồn tại
+    // Thêm sản phẩm vào giỏ, lấy user từ JWT (email)
+    @SecurityRequirement(name = "bearerAuth")
     @PostMapping
-    public ResponseEntity<CartItem> addCartItem(
-            @RequestParam Long userId,
-            @RequestParam Long bookId,
-            @RequestParam Integer quantity) {
-        return ResponseEntity.ok(cartItemService.addOrUpdateCartItem(userId, bookId, quantity));
+    public ResponseEntity<?> addToCart(@RequestBody CartItemRequest request) {
+        try {
+            String email = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            User user = userRepository.findByEmail(email)
+                    .orElseThrow(() -> new RuntimeException("User not found"));
+
+            Book book = bookRepository.findById(request.getBookId())
+                    .orElseThrow(() -> new RuntimeException("Book not found"));
+
+            CartItem added = cartService.addToCart(user, book, request.getQuantity());
+            return ResponseEntity.ok(added);
+
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
-    // Cập nhật số lượng một sản phẩm trong giỏ hàng
-    @PutMapping("/{id}")
-    public ResponseEntity<CartItem> updateCartItemQuantity(
-            @PathVariable("id") Long cartItemId,
-            @RequestParam Integer quantity) {
-        return ResponseEntity.ok(cartItemService.updateQuantity(cartItemId, quantity));
+    // Cập nhật số lượng trong giỏ
+    @SecurityRequirement(name = "bearerAuth")
+    @PutMapping("/{cartItemId}")
+    public ResponseEntity<?> updateQuantity(@PathVariable Long cartItemId, @RequestBody UpdateQuantityRequest request) {
+        try {
+            CartItem updated = cartService.updateQuantity(cartItemId, request.getQuantity());
+            return ResponseEntity.ok(updated);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
-    // Xóa một sản phẩm khỏi giỏ hàng
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteCartItem(@PathVariable("id") Long cartItemId) {
-        cartItemService.removeCartItem(cartItemId);
-        return ResponseEntity.noContent().build();
+    // Xóa sản phẩm khỏi giỏ
+    @SecurityRequirement(name = "bearerAuth")
+    @DeleteMapping("/{cartItemId}")
+    public ResponseEntity<?> removeFromCart(@PathVariable Long cartItemId) {
+        try {
+            cartService.removeFromCart(cartItemId);
+            return ResponseEntity.ok("Removed from cart");
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
-    // Xóa toàn bộ giỏ hàng của người dùng
-    @DeleteMapping("/user/{userId}")
-    public ResponseEntity<Void> clearCart(@PathVariable Long userId) {
-        cartItemService.clearCartByUser(userId);
-        return ResponseEntity.noContent().build();
+    // Lấy danh sách giỏ hàng của user hiện tại
+    @SecurityRequirement(name = "bearerAuth")
+    @GetMapping("/me")
+    public ResponseEntity<?> getMyCart() {
+        try {
+            String email = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            User user = userRepository.findByEmail(email)
+                    .orElseThrow(() -> new RuntimeException("User not found"));
+
+            List<CartItem> items = cartService.getCartItemsByUser(user.getUserId());
+            return ResponseEntity.ok(items);
+
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 }
+

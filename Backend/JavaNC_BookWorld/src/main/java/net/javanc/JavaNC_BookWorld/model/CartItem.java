@@ -5,7 +5,8 @@ import jakarta.persistence.*;
 public class CartItem {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Column(name = "id")
+    private Long cartItemId;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
@@ -18,19 +19,19 @@ public class CartItem {
     private int quantity;
 
     public CartItem(){}
-    public CartItem(Long id, User user, Book book, int quantity) {
-        this.id = id;
+    public CartItem(Long cartItemId, User user, Book book, int quantity) {
+        this.cartItemId = cartItemId;
         this.user = user;
         this.book = book;
         this.quantity = quantity;
     }
 
     public Long getId() {
-        return id;
+        return cartItemId;
     }
 
     public void setId(Long id) {
-        this.id = id;
+        this.cartItemId = id;
     }
 
     public User getUser() {
