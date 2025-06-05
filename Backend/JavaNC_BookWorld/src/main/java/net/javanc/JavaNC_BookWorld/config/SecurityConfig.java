@@ -27,6 +27,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
                         .requestMatchers("/api/users/send-otp", "/api/users/register", "/api/users/login").permitAll()
+                        .requestMatchers("/thank-you", "/cancel").permitAll() // Cho phép PayOS redirect
+                        .requestMatchers("/api/webhook/payos").permitAll()
                         // Thông tin cá nhân
                         .requestMatchers("/api/users/me").hasAnyAuthority("User", "Admin")
                         // Quản lý người dùng - chỉ Admin
@@ -51,7 +53,10 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.DELETE, "/api/genres/**").hasAuthority("Admin")
 
                         // Order API
-                        .requestMatchers("/api/orders").hasAnyAuthority("User", "Admin")
+                        .requestMatchers(HttpMethod.GET, "/api/orders/**").hasAnyAuthority("User", "Admin")
+                        .requestMatchers(HttpMethod.POST, "/api/orders").hasAnyAuthority("User", "Admin")
+                        .requestMatchers(HttpMethod.PUT, "/api/orders/**").hasAuthority("Admin")
+                        .requestMatchers(HttpMethod.DELETE, "/api/orders/**").hasAnyAuthority("User", "Admin")
 
                         // Các route còn lại cần đăng nhập
                         .anyRequest().authenticated()

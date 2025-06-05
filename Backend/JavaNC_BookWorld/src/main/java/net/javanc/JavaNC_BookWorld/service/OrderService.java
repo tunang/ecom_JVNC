@@ -1,80 +1,133 @@
-package net.javanc.JavaNC_BookWorld.service;
+    package net.javanc.JavaNC_BookWorld.service;
 
-import net.javanc.JavaNC_BookWorld.dto.OrderRequest;
-import net.javanc.JavaNC_BookWorld.model.*;
-import net.javanc.JavaNC_BookWorld.repository.*;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+    import net.javanc.JavaNC_BookWorld.dto.OrderRequest;
+    import net.javanc.JavaNC_BookWorld.model.*;
+    import net.javanc.JavaNC_BookWorld.repository.*;
+    import org.springframework.beans.factory.annotation.Autowired;
+    import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+    import vn.payos.PayOS;
+    import vn.payos.type.PaymentData;
+    import vn.payos.type.ItemData;
+    import vn.payos.type.CheckoutResponseData;
 
-@Service
-public class OrderService {
+    import java.math.BigDecimal;
+    import java.time.LocalDateTime;
+    import java.util.ArrayList;
+    import java.util.List;
 
-    @Autowired
-    private UserRepository userRepository;
+    @Service
+    public class OrderService {
 
-    @Autowired
-    private BookRepository bookRepository;
+        @Autowired
+        private UserRepository userRepository;
 
-    @Autowired
-    private OrderRepository orderRepository;
+        @Autowired
+        private BookRepository bookRepository;
 
-    public Order createOrder(OrderRequest orderRequest, String email) {
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        @Autowired
+        private OrderRepository orderRepository;
 
-        Order order = new Order();
-        order.setUser(user);
-        order.setStatus("Pending");
-        order.setCreatedAt(LocalDateTime.now());
+        @Autowired
+        private PayOS payOS;
 
-        List<OrderItem> orderItems = new ArrayList<>();
-        BigDecimal total = BigDecimal.ZERO;
+        public Order createOrder(OrderRequest orderRequest, String email) {
+            User user = userRepository.findByEmail(email)
+                    .orElseThrow(() -> new RuntimeException("User not found"));
 
-        for (OrderRequest.OrderItemRequest itemRequest : orderRequest.getOrderItems()) {
-            Book book = bookRepository.findById(itemRequest.getBookId())
-                    .orElseThrow(() -> new RuntimeException("Book not found"));
+            Order order = new Order();
+            order.setUser(user);
+            order.setStatus("Pending");
+            order.setAddress(orderRequest.getAddress());
+            order.setCreatedAt(LocalDateTime.now());
 
-            OrderItem item = new OrderItem();
-            item.setBook(book);
-            item.setQuantity(itemRequest.getQuantity());
-            item.setPrice(itemRequest.getPrice()); // hoặc book.getPrice() nếu muốn cố định theo giá sách
-            item.setOrder(order);
+            List<OrderItem> orderItems = new ArrayList<>();
+            BigDecimal total = BigDecimal.ZERO;
 
-            orderItems.add(item);
-            total = total.add(item.getPrice().multiply(BigDecimal.valueOf(item.getQuantity())));
+            for (OrderRequest.OrderItemRequest itemRequest : orderRequest.getOrderItems()) {
+                Book book = bookRepository.findById(itemRequest.getBookId())
+                        .orElseThrow(() -> new RuntimeException("Book not found"));
+
+                OrderItem item = new OrderItem();
+                item.setBook(book);
+                item.setQuantity(itemRequest.getQuantity());
+                item.setPrice(itemRequest.getPrice());
+                item.setOrder(order);
+
+                orderItems.add(item);
+                total = total.add(item.getPrice().multiply(BigDecimal.valueOf(item.getQuantity())));
+            }
+
+            order.setOrderItems(orderItems);
+            order.setTotalAmount(total);
+
+            return orderRepository.save(order);
+        }
+        public List<Order> getOrdersByUserEmail(String email) {
+            User user = userRepository.findByEmail(email)
+                    .orElseThrow(() -> new RuntimeException("User not found"));
+            return orderRepository.findByUser(user);
         }
 
-        order.setOrderItems(orderItems);
-        order.setTotalAmount(total);
-
-        return orderRepository.save(order);
-    }
-    public List<Order> getOrdersByUserEmail(String email) {
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-        return orderRepository.findByUser(user);
-    }
-
-    public Order getOrderById(Long orderId) {
-        return orderRepository.findById(orderId)
-                .orElseThrow(() -> new RuntimeException("Order not found"));
-    }
-
-    public Order updateOrderStatus(Long orderId, String status) {
-        Order order = getOrderById(orderId);
-        order.setStatus(status);
-        return orderRepository.save(order);
-    }
-
-    public void deleteOrder(Long orderId) {
-        if (!orderRepository.existsById(orderId)) {
-            throw new RuntimeException("Order not found");
+        public Order getOrderById(Long orderId) {
+            return orderRepository.findById(orderId)
+                    .orElseThrow(() -> new RuntimeException("Order not found"));
         }
-        orderRepository.deleteById(orderId);
+
+        public Order updateOrderStatus(Long orderId, String status) {
+            Order order = getOrderById(orderId);
+            order.setStatus(status);
+            return orderRepository.save(order);
+        }
+
+        public void deleteOrder(Long orderId) {
+            if (!orderRepository.existsById(orderId)) {
+                throw new RuntimeException("Order not found");
+            }
+            orderRepository.deleteById(orderId);
+        }
+
+        public String createPaymentLink(Order order) {
+            ItemData item = ItemData.builder()
+                    .name("Đơn hàng #" + order.getOrderId())
+                    .quantity(1)
+                    .price(order.getTotalAmount().intValue())
+                    .build();
+
+            PaymentData paymentData = PaymentData.builder()
+                    .orderCode(order.getOrderId()) // orderId là Long -> hợp lệ
+                    .amount(order.getTotalAmount().intValue())
+                    .description("Thanh toán đơn hàng #" + order.getOrderId())
+                    .returnUrl("https://bookworld.vn/thank-you")
+                    .cancelUrl("https://bookworld.vn/cancel")
+                    .items(List.of(item))
+                    .build();
+
+            CheckoutResponseData response = null;
+            try {
+                response = payOS.createPaymentLink(paymentData);
+            } catch (Exception e) {
+                e.printStackTrace();
+                throw new RuntimeException("Tạo link thanh toán thất bại: " + e.getMessage(), e);
+            }
+            return response.getCheckoutUrl();
+        }
+
+        public void updateOrderStatusByOrderCode(Long orderCode, String status) {
+            Order order = orderRepository.findById(orderCode)
+                    .orElseThrow(() -> new RuntimeException("Order not found with orderCode: " + orderCode));
+
+            // Map trạng thái
+            if ("PAID".equalsIgnoreCase(status)) {
+                order.setStatus("Đã thanh toán");
+            } else if ("FAILED".equalsIgnoreCase(status)) {
+                order.setStatus("Thanh toán thất bại");
+            } else if ("CANCELED".equalsIgnoreCase(status)) {
+                order.setStatus("Đã hủy");
+            } else {
+                order.setStatus(status);
+            }
+
+            orderRepository.save(order);
+        }
     }
-}
