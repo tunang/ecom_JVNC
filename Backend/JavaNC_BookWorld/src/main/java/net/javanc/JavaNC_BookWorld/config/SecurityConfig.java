@@ -1,4 +1,5 @@
 package net.javanc.JavaNC_BookWorld.config;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -17,6 +18,7 @@ public class SecurityConfig {
     public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter) {
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
     }
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
@@ -35,12 +37,12 @@ public class SecurityConfig {
                         .requestMatchers("/api/cart-items/**").hasAnyAuthority("User", "Admin")
 
                         // Book API
-                        .requestMatchers(HttpMethod.GET, "/api/books/search").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/books/genre/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/books/**").hasAnyAuthority("User", "Admin")
+                        .requestMatchers(HttpMethod.GET, "/api/books/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/books/**").hasAuthority("Admin")
                         .requestMatchers(HttpMethod.PUT, "/api/books/**").hasAuthority("Admin")
                         .requestMatchers(HttpMethod.DELETE, "/api/books/**").hasAuthority("Admin")
+                        .requestMatchers(HttpMethod.GET, "/api/books/search").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/books/genre/**").permitAll()
 
                         // Genre API
                         .requestMatchers(HttpMethod.GET, "/api/genres/**").permitAll()

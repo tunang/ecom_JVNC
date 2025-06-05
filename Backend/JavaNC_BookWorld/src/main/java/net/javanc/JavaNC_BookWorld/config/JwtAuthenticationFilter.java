@@ -1,4 +1,5 @@
 package net.javanc.JavaNC_BookWorld.config;
+
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -19,6 +20,7 @@ import java.util.regex.Pattern;
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private static final Pattern JWT_PATTERN = Pattern.compile("^[A-Za-z0-9-_]+\\.[A-Za-z0-9-_]+\\.[A-Za-z0-9-_]+$");
+
     @Override
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,

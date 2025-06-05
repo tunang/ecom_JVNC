@@ -31,7 +31,9 @@ public class User {
     @Column(name = "created_at")
     private LocalDateTime createdAt = LocalDateTime.now();
 
-    public User(){}
+    public User() {
+    }
+
     public User(Long userId, String email, String name, String phone, String password, String role, String profilePicture, LocalDateTime createdAt) {
         this.userId = userId;
         this.email = email;

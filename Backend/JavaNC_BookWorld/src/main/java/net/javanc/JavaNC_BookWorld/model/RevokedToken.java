@@ -10,7 +10,10 @@ public class RevokedToken {
     @Id
     private String token;
     private Date revokedAt;
-    public RevokedToken() {}
+
+    public RevokedToken() {
+    }
+
     public RevokedToken(String token, Date revokedAt) {
         this.token = token;
         this.revokedAt = revokedAt;

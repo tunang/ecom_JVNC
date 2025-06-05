@@ -82,6 +82,7 @@ public class BookController {
     }
 
     @GetMapping("/genre/{genreId}")
+    @Operation(summary = "Lấy sách theo genreId")
     public ResponseEntity<List<Book>> getBooksByGenre(@PathVariable Long genreId) {
         List<Book> books = bookService.getBooksByGenreId(genreId);
         if (books.isEmpty()) {
@@ -91,6 +92,7 @@ public class BookController {
     }
 
     @GetMapping("/search")
+    @Operation(summary = "Tìm kiếm sách")
     public ResponseEntity<List<Book>> searchBooks(@RequestParam String title) {
         List<Book> books = bookService.searchBooksByTitle(title);
         if (books.isEmpty()) {

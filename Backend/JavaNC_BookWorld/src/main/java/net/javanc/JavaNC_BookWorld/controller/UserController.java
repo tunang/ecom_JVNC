@@ -1,5 +1,6 @@
 package net.javanc.JavaNC_BookWorld.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
@@ -35,6 +36,7 @@ public class UserController {
     @PreAuthorize("hasAuthority('Admin')")
     @SecurityRequirement(name = "bearerAuth")
     @GetMapping
+    @Operation(summary = "Lấy danh sách tất cả user")
     public ResponseEntity<?> getAllUsers() {
         String email = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         User requester = userService.getUserByEmail(email).orElse(null);
@@ -50,6 +52,7 @@ public class UserController {
     @PreAuthorize("hasAuthority('Admin')")
     @SecurityRequirement(name = "bearerAuth")
     @GetMapping("/{id}")
+    @Operation(summary = "Lấy thông tin user theo id")
     public ResponseEntity<User> getUserById(@PathVariable Long id) {
         Optional<User> user = userService.getUserById(id);
         if (user.isPresent()) {
@@ -62,6 +65,7 @@ public class UserController {
 
     @PreAuthorize("hasAuthority('Admin')")
     @SecurityRequirement(name = "bearerAuth")
+    @Operation(summary = "Sửa thông tin user theo id")
     @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> updateUserByAdmin(
             @PathVariable Long id,
@@ -87,6 +91,7 @@ public class UserController {
     @PreAuthorize("hasAuthority('Admin')")
     @SecurityRequirement(name = "bearerAuth")
     @DeleteMapping("/{id}")
+    @Operation(summary = "Xóa thông tin user")
     public ResponseEntity<?> deleteUser(@PathVariable Long id) {
         try {
             userService.deleteUser(id);
@@ -97,6 +102,7 @@ public class UserController {
     }
 
     @PostMapping("/send-otp")
+    @Operation(summary = "Gửi otp về email")
     public ResponseEntity<?> sendOtp(@RequestBody SendOtpRequest request) {
         try {
             userService.sendOtpToEmail(request.getEmail());
@@ -107,6 +113,7 @@ public class UserController {
     }
 
     @PostMapping("/register")
+    @Operation(summary = "Nhập form đăng kí + otp")
     public ResponseEntity<?> registerWithOtp(@RequestBody RegisterWithOtpRequest request) {
         try {
             User user = userService.registerUserWithOtp(request.getRegisterRequest(), request.getOtp());
@@ -118,6 +125,7 @@ public class UserController {
     }
 
     @PostMapping("/login")
+    @Operation(summary = "Đăng nhập")
     public ResponseEntity<?> login(@RequestBody LoginRequest request) {
         try {
             User user = userService.login(request.getEmail(), request.getPassword());
@@ -131,6 +139,7 @@ public class UserController {
 
     @SecurityRequirement(name = "bearerAuth")
     @GetMapping("/me")
+    @Operation(summary = "Lấy thông tin người dùng với id từ JWT")
     public ResponseEntity<User> getCurrentUser(HttpServletRequest request) {
         String email = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Optional<User> userOpt = userService.getUserByEmail(email);
@@ -145,6 +154,7 @@ public class UserController {
 
     @SecurityRequirement(name = "bearerAuth")
     @PutMapping(value = "/me", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @Operation(summary = "Sửa thông tin người dùng với id từ JWT")
     public ResponseEntity<?> updateMyInfo(
             @ModelAttribute UserUpdateDTO dto) {
 
@@ -167,6 +177,7 @@ public class UserController {
 
     @SecurityRequirement(name = "bearerAuth")
     @PostMapping("/logout")
+    @Operation(summary = "Đăng xuất và thu hồi token")
     public ResponseEntity<?> logout(HttpServletRequest request) {
         String authHeader = request.getHeader("Authorization");
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
@@ -194,9 +205,11 @@ public class UserController {
                 user.getCreatedAt()
         );
     }
+
     @PreAuthorize("hasAuthority('Admin')")
     @SecurityRequirement(name = "bearerAuth")
     @PostMapping(value = "/admin-create", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @Operation(summary = "Tạo tài khoản mới bằng quyền Admin")
     public ResponseEntity<?> adminCreateUser(@ModelAttribute AdminRegister request) {
         try {
             User createdUser = userService.createUserByAdmin(request);
