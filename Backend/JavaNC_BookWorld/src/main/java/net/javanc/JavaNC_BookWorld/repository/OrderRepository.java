@@ -1,9 +1,11 @@
 package net.javanc.JavaNC_BookWorld.repository;
 
 import net.javanc.JavaNC_BookWorld.model.Order;
+import net.javanc.JavaNC_BookWorld.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
 
-@Repository
+import java.util.List;
+
 public interface OrderRepository extends JpaRepository<Order, Long> {
+    List<Order> findByUser(User user);
 }
