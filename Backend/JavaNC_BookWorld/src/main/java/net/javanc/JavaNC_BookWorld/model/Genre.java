@@ -15,7 +15,8 @@ public class Genre {
     private String name;
 
     // Constructors
-    public Genre() {}
+    public Genre() {
+    }
 
     public Genre(Long genreId, String name) {
         this.genreId = genreId;

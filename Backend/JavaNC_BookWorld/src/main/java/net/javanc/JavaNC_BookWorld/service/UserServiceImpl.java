@@ -180,6 +180,7 @@ public class UserServiceImpl implements UserService {
         otpStorage.remove(request.getEmail());
         return userRepo.save(user);
     }
+
     @Override
     public User createUserByAdmin(AdminRegister request) {
         if (userRepo.findByEmail(request.getEmail()).isPresent()) {

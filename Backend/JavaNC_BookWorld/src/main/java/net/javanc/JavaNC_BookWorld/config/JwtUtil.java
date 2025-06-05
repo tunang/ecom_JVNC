@@ -1,4 +1,5 @@
 package net.javanc.JavaNC_BookWorld.config;
+
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -27,6 +28,7 @@ public class JwtUtil {
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
+
     public static String extractRole(String token) {
         Claims claims = Jwts.parserBuilder()
                 .setSigningKey(getSigningKey())
@@ -36,6 +38,7 @@ public class JwtUtil {
 
         return claims.get("role", String.class);
     }
+
     public static String extractSubject(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(getSigningKey())
@@ -56,6 +59,7 @@ public class JwtUtil {
             return false;
         }
     }
+
     public boolean isTokenValid(String token) {
         try {
             Claims claims = parseToken(token).getBody();

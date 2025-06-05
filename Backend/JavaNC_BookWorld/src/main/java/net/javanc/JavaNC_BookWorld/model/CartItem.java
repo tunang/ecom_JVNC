@@ -1,5 +1,7 @@
 package net.javanc.JavaNC_BookWorld.model;
+
 import jakarta.persistence.*;
+
 @Entity
 @Table(name = "cart_items")
 public class CartItem {
@@ -18,7 +20,9 @@ public class CartItem {
 
     private int quantity;
 
-    public CartItem(){}
+    public CartItem() {
+    }
+
     public CartItem(Long cartItemId, User user, Book book, int quantity) {
         this.cartItemId = cartItemId;
         this.user = user;

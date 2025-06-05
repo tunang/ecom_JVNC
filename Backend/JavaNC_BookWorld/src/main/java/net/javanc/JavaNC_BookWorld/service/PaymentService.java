@@ -49,12 +49,13 @@ public class PaymentService {
 
         ResponseEntity<Map> response = restTemplate.postForEntity(payosApiUrl, entity, Map.class);
 
-        if(response.getStatusCode() == HttpStatus.OK && response.getBody() != null) {
+        if (response.getStatusCode() == HttpStatus.OK && response.getBody() != null) {
             return (String) response.getBody().get("payment_url");
         } else {
             throw new RuntimeException("Không tạo được payment PayOS");
         }
     }
+
     public void processWebhook(Map<String, Object> payload) {
         try {
             String status = (String) payload.get("status"); // trạng thái: "PAID", "FAILED", ...

@@ -9,14 +9,17 @@ public class AdminRegister {
     private String phone;
     private String role;
     private MultipartFile profilePicture;
-    public AdminRegister() {}
-    public AdminRegister(String email, String password, String name, String phone, String role,MultipartFile profilePicture) {
+
+    public AdminRegister() {
+    }
+
+    public AdminRegister(String email, String password, String name, String phone, String role, MultipartFile profilePicture) {
         this.email = email;
         this.password = password;
         this.name = name;
         this.phone = phone;
         this.role = role;
-        this.profilePicture=profilePicture;
+        this.profilePicture = profilePicture;
     }
 
     public String getEmail() {

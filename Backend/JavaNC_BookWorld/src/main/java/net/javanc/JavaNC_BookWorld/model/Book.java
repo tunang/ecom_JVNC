@@ -30,7 +30,10 @@ public class Book {
 
     @Column(name = "created_at")
     private LocalDateTime createdAt = LocalDateTime.now();
-    public Book(){}
+
+    public Book() {
+    }
+
     public Book(Long bookId, String title, String author, String description, BigDecimal price, Integer stock, String imageUrl, Genre genre, LocalDateTime createdAt) {
         this.bookId = bookId;
         this.title = title;
