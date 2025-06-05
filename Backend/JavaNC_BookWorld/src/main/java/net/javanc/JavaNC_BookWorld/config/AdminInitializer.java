@@ -24,7 +24,7 @@ public class AdminInitializer {
             admin.setEmail("admin@bookworld.com");
             admin.setName("Administrator");
             admin.setPhone("0123456789");
-                admin.setPassword(passwordEncoder.encode("admin123"));
+            admin.setPassword(passwordEncoder.encode("admin123"));
             admin.setRole("Admin");
 
             userRepository.save(admin);
