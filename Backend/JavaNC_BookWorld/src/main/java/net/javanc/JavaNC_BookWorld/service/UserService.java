@@ -14,7 +14,7 @@ import java.util.Random;
 public interface UserService {
     List<User> getAllUsers();
     Optional<User> getUserById(Long id);
-    User updateUserByAdmin(Long id, UserUpdateDTO dto); // Bỏ MultipartFile image
+    User updateUserByAdmin(Long id, AdminRegister dto); // Bỏ MultipartFile image
     void deleteUser(Long id);
     Optional<User> getUserByEmail(String email);
     User registerUser(RegisterRequest request);

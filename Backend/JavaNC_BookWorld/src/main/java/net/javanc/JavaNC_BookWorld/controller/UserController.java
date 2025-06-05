@@ -65,7 +65,7 @@ public class UserController {
     @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> updateUserByAdmin(
             @PathVariable Long id,
-            @ModelAttribute UserUpdateDTO userDetails) {
+            @ModelAttribute AdminRegister userDetails) {
 
         try {
             System.out.println("Updating user with ID: " + id);

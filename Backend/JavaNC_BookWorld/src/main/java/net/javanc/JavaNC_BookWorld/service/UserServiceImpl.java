@@ -48,7 +48,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User updateUserByAdmin(Long id, UserUpdateDTO dto) {
+    public User updateUserByAdmin(Long id, AdminRegister dto) {
         User user = userRepo.findById(id)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy người dùng với ID: " + id));
 
@@ -59,6 +59,9 @@ public class UserServiceImpl implements UserService {
 
         if (dto.getPhone() != null && !dto.getPhone().trim().isEmpty()) {
             user.setPhone(dto.getPhone().trim());
+        }
+        if (dto.getRole() != null && !dto.getRole().trim().isEmpty()) {
+            user.setPhone(dto.getRole().trim());
         }
 
         if (dto.getPassword() != null && !dto.getPassword().trim().isEmpty()) {
