@@ -23,6 +23,9 @@ public class Order {
 
     private String status = "Pending";
 
+    @Column(name = "address", nullable = false)
+    private String address;
+
     @Column(name = "created_at")
     private LocalDateTime createdAt = LocalDateTime.now();
 
@@ -84,5 +87,12 @@ public class Order {
         this.orderItems = orderItems;
     }
 
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
 }
 

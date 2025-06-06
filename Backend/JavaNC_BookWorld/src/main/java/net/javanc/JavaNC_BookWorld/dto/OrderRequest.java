@@ -5,6 +5,15 @@ import java.util.List;
 
 public class OrderRequest {
     private List<OrderItemRequest> orderItems;
+    private String address;
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
 
     public List<OrderItemRequest> getOrderItems() {
         return orderItems;

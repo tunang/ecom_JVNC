@@ -10,6 +10,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/api/orders")
 public class OrderController {
@@ -23,7 +25,13 @@ public class OrderController {
     public ResponseEntity<?> createOrder(@RequestBody OrderRequest orderRequest) {
         String email = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Order createdOrder = orderService.createOrder(orderRequest, email);
-        return ResponseEntity.ok(createdOrder);
+        String paymentUrl = null;
+        try {
+            paymentUrl = orderService.createPaymentLink(createdOrder);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        return ResponseEntity.ok(Map.of("paymentUrl", paymentUrl));
     }
 
     @GetMapping
