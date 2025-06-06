@@ -58,6 +58,24 @@ const bookSlice = createSlice({
       state.error = action.payload;
     },
 
+    fetchBooksByGenreRequest: (state, action: PayloadAction<{ genreId: number }>) => {
+      state.isLoading = true;
+      state.error = null;
+    },
+    fetchBooksByGenreSuccess: (state, action: PayloadAction<Book[]>) => {
+      state.isLoading = false;
+      state.books = action.payload;
+      state.totalBooks = action.payload.length;
+      state.currentPage = 1;
+      state.error = null;
+    },
+    fetchBooksByGenreFailure: (state, action: PayloadAction<string>) => {
+      state.books = [];
+      state.isLoading = false;
+      state.error = action.payload;
+    },
+
+
     // Create book actions (Admin only)
     createBookRequest: (state, action: PayloadAction<any>) => {
       state.isLoading = true;
@@ -144,6 +162,9 @@ export const {
   deleteBookFailure,
   clearError,
   clearCurrentBook,
+  fetchBooksByGenreRequest,
+  fetchBooksByGenreSuccess,
+  fetchBooksByGenreFailure,
 } = bookSlice.actions;
 
 export default bookSlice.reducer;

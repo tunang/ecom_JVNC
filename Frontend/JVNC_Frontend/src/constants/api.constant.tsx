@@ -17,6 +17,18 @@ export const ApiConstant = {
 
     genre:{
       getAll: '/genres',
+    },
+
+    book:{
+      getAll: '/books',
+      getByGenre: '/books/genre/:genreId',
+      getByID: '/books/:id',
+    },
+
+    order:{
+      create: '/orders',
+      getAll: '/orders',
+      getById: '/orders/:id',
     }
 
   };

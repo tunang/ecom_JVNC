@@ -30,6 +30,7 @@ const authSlice = createSlice({
         state.isAuthenticated = true;
       }
     },
+
     setAuthUser: (state, action: PayloadAction<User>) => {
       state.user = action.payload;
       state.isAuthenticated = true;
@@ -95,6 +96,7 @@ const authSlice = createSlice({
       state.isAuthenticated = false;
       state.isLoading = false;
       state.error = null;
+      state.cart = null;
       localStorage.removeItem('token');
     },
     logoutFailure: (state, action: PayloadAction<string>) => {

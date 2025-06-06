@@ -131,6 +131,21 @@ const userSlice = createSlice({
     clearCurrentUser: (state) => {
       state.currentUser = null;
     },
+
+    // Update profile actions (for authenticated user)
+    updateProfileRequest: (state, action: PayloadAction<any>) => {
+      state.isLoading = true;
+      state.error = null;
+    },
+    updateProfileSuccess: (state, action: PayloadAction<User>) => {
+      state.isLoading = false;
+      state.currentUser = action.payload;
+      state.error = null;
+    },
+    updateProfileFailure: (state, action: PayloadAction<string>) => {
+      state.isLoading = false;
+      state.error = action.payload;
+    },
   },
 });
 
@@ -149,6 +164,9 @@ export const {
   deleteUserFailure,
   clearError,
   clearCurrentUser,
+  updateProfileRequest,
+  updateProfileSuccess,
+  updateProfileFailure,
 } = userSlice.actions;
 
 export default userSlice.reducer;

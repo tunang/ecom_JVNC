@@ -23,7 +23,7 @@ import type { SagaIterator } from 'redux-saga';
 // Fetch cart items saga
 function* fetchCartItemsSaga():SagaIterator {
   try {
-    const response: any = yield call(api.get, '/api/cart-items');
+    const response: any = yield call(api.get, '/cart/me');
 
     yield put(fetchCartItemsSuccess(response));
   } catch (error: any) {
@@ -36,7 +36,7 @@ function* addToCartSaga(action: PayloadAction<{ bookId: number; quantity: number
   try {
     const { bookId, quantity } = action.payload;
     
-    const response: any = yield call(api.post, '/api/cart-items', {
+    const response: any = yield call(api.post, '/cart', {
       bookId,
       quantity,
     });
@@ -52,7 +52,7 @@ function* updateCartItemSaga(action: PayloadAction<{ itemId: number; quantity: n
   try {
     const { itemId, quantity } = action.payload;
     
-    const response: any = yield call(api.put, `/api/cart-items/${itemId}`, {
+    const response: any = yield call(api.put, `/cart/${itemId}`, {
       quantity,
     });
 
@@ -67,7 +67,7 @@ function* removeFromCartSaga(action: PayloadAction<number>):SagaIterator {
   try {
     const itemId = action.payload;
     
-    yield call(api.delete, `/api/cart-items/${itemId}`);
+    yield call(api.delete, `/cart/${itemId}`);
 
     yield put(removeFromCartSuccess(itemId));
   } catch (error: any) {
@@ -78,7 +78,7 @@ function* removeFromCartSaga(action: PayloadAction<number>):SagaIterator {
 // Clear cart saga
 function* clearCartSaga():SagaIterator {
   try {
-    yield call(api.delete, '/api/cart-items');
+    yield call(api.delete, '/cart');
 
     yield put(clearCartSuccess());
   } catch (error: any) {

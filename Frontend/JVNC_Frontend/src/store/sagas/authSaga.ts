@@ -17,6 +17,7 @@ import {
   logoutFailure,
   logoutRequest,
 } from '../slices/authSlice';
+import { fetchCartItemsRequest } from '../slices/cartSlice';
 import { api } from '../../services/api.service';
 import { ApiConstant } from '@/constants/api.constant';
 
@@ -39,6 +40,9 @@ function* initializeAuthSaga(): SagaIterator {
       // Try to fetch current user data to validate the token
       const user: any = yield call(api.get, '/users/me');
       yield put(setAuthUser(user));
+      
+      // Fetch cart items after successful auth initialization
+      yield put(fetchCartItemsRequest());
     }
   } catch (error: any) {
     // If token is invalid, remove it
@@ -64,6 +68,9 @@ function* loginSaga(action: PayloadAction<{ email: string; password: string }>):
       user: response.user,
       token: response.token,
     }));
+
+    // Fetch cart items after successful login
+    yield put(fetchCartItemsRequest());
   } catch (error: any) {
     yield put(loginFailure(error.response?.data?.message || 'Đăng nhập thất bại'));
   }
@@ -91,6 +98,9 @@ function* registerSaga(action: PayloadAction<{ email: string; name: string; phon
       user: response.user,
       token: response.token,
     }));
+
+    // Fetch cart items after successful registration
+    yield put(fetchCartItemsRequest());
   } catch (error: any) {
     yield put(registerFailure(error.response?.data?.message || 'Đăng ký thất bại'));
   }
@@ -111,7 +121,6 @@ function* sendOtpSaga(action: PayloadAction<{ email: string }>): SagaIterator {
 
 function* logoutSaga(): SagaIterator {
   try {
-
     yield call(api.post, ApiConstant.auth.logout);
     localStorage.removeItem('token');
     yield put(logoutSuccess());

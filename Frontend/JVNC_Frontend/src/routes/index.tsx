@@ -9,13 +9,23 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import ProtectedRoute from "./ProtectedRoute";
 import { Role } from "@/types/user.type";
 import Genres from "@/pages/admin/genres";
+import Genre from "@/pages/product/genre";
+import ProductDetail from "@/pages/product/detail";
+import Cart from "@/pages/cart";
+import Profile from "@/pages/profile";
+import HomePage from "@/pages/home";
+import Checkout from "@/pages/checkout";
+import OrdersPage from "@/pages/order";
 
 const router = createBrowserRouter([
-
   {
     path: '/',
     element: <MainLayout />,
     children: [
+        {
+          index: true,
+          element: <HomePage />
+        },
         {
           path: 'login',
           element: <Login />
@@ -23,6 +33,30 @@ const router = createBrowserRouter([
         {
           path: 'signup',
           element: <Signup />
+        },
+        {
+          path: 'genre/:genreId',
+          element: <Genre />
+        },
+        {
+          path: 'product/:productId',
+          element: <ProductDetail />
+        },
+        {
+          path: 'cart',
+          element: <Cart />
+        },
+        {
+          path: 'checkout',
+          element: <Checkout />
+        },
+        {
+          path: 'profile',
+          element: <Profile />
+        },
+        {
+          path: 'orders',
+          element: <OrdersPage />
         }
     ]
   },

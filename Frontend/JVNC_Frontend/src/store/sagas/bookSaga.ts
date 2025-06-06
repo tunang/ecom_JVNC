@@ -16,6 +16,9 @@ import {
   deleteBookRequest,
   deleteBookSuccess,
   deleteBookFailure,
+  fetchBooksByGenreSuccess,
+  fetchBooksByGenreFailure,
+  fetchBooksByGenreRequest,
 } from '../slices/bookSlice';
 import { api, apiDefaultUpload } from '../../services/api.service';
 import type { SagaIterator } from 'redux-saga';
@@ -47,6 +50,17 @@ function* fetchBookByIdSaga(action: PayloadAction<number>): SagaIterator {
     yield put(fetchBookByIdSuccess(response));
   } catch (error: any) {
     yield put(fetchBookByIdFailure(error.response?.data?.message || 'Lỗi khi tải thông tin sách'));
+  }
+}
+function* fetchBooksByGenreSaga(action: PayloadAction<{ genreId: number }>): SagaIterator {
+  try {
+    const { genreId } = action.payload;
+    
+    const response: any = yield call(api.get, `/books/genre/${genreId}`);
+    console.log(response);
+    yield put(fetchBooksByGenreSuccess(response));
+  } catch (error: any) {
+    yield put(fetchBooksByGenreFailure(error.response?.data?.message || 'Lỗi khi tải danh sách sách'));
   }
 }
 
@@ -124,5 +138,6 @@ export function* bookSaga(): SagaIterator {
   yield takeLatest(fetchBookByIdRequest.type, fetchBookByIdSaga);
   yield takeLatest(createBookRequest.type, createBookSaga);
   yield takeLatest(updateBookRequest.type, updateBookSaga);
-  yield takeLatest(deleteBookRequest.type, deleteBookSaga);
+  yield takeLatest(deleteBookRequest.type, deleteBookSaga); 
+  yield takeLatest(fetchBooksByGenreRequest.type, fetchBooksByGenreSaga);
 } 
