@@ -26,6 +26,12 @@ public class Order {
     @Column(name = "address", nullable = false)
     private String address;
 
+    @Column(name = "phone", nullable = false)
+    private String phone;
+
+    @Column(name = "payment_url")
+    private String paymentUrl;
+
     @Column(name = "created_at")
     private LocalDateTime createdAt = LocalDateTime.now();
 
@@ -93,6 +99,22 @@ public class Order {
 
     public void setAddress(String address) {
         this.address = address;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public String getPaymentUrl() {
+        return paymentUrl;
+    }
+
+    public void setPaymentUrl(String paymentUrl) {
+        this.paymentUrl = paymentUrl;
     }
 }
 

@@ -25,13 +25,7 @@ public class OrderController {
     public ResponseEntity<?> createOrder(@RequestBody OrderRequest orderRequest) {
         String email = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Order createdOrder = orderService.createOrder(orderRequest, email);
-        String paymentUrl = null;
-        try {
-            paymentUrl = orderService.createPaymentLink(createdOrder);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-        return ResponseEntity.ok(Map.of("paymentUrl", paymentUrl));
+        return ResponseEntity.ok(Map.of("paymentUrl", createdOrder.getPaymentUrl()));
     }
 
     @GetMapping
