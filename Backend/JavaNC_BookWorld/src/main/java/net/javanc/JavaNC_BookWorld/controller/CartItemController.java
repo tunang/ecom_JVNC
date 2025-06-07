@@ -95,5 +95,16 @@ public class CartItemController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
+
+    @DeleteMapping("/clear")
+    @SecurityRequirement(name = "bearerAuth")
+    @Operation(summary = "Xoá toàn bộ giỏ hàng của người dùng hiện tại")
+    public ResponseEntity<?> clearUserCart() {
+        String email = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        cartService.clearCartByUser(user);
+        return ResponseEntity.ok("Đã xoá toàn bộ giỏ hàng");
+    }
 }
 

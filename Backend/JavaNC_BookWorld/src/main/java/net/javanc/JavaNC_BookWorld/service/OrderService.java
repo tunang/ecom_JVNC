@@ -35,12 +35,15 @@
             User user = userRepository.findByEmail(email)
                     .orElseThrow(() -> new RuntimeException("User not found"));
 
+            // Tạo đơn hàng
             Order order = new Order();
             order.setUser(user);
             order.setStatus("Pending");
             order.setAddress(orderRequest.getAddress());
+            order.setPhone(orderRequest.getPhone());
             order.setCreatedAt(LocalDateTime.now());
 
+            // Tính tổng tiền và danh sách sản phẩm
             List<OrderItem> orderItems = new ArrayList<>();
             BigDecimal total = BigDecimal.ZERO;
 
@@ -61,8 +64,17 @@
             order.setOrderItems(orderItems);
             order.setTotalAmount(total);
 
-            return orderRepository.save(order);
+            // Lưu đơn hàng để lấy orderId
+            Order savedOrder = orderRepository.save(order);
+
+            // Tạo link thanh toán
+            String paymentUrl = createPaymentLink(savedOrder);
+            savedOrder.setPaymentUrl(paymentUrl);
+
+            // Lưu lại đơn hàng đã có link
+            return orderRepository.save(savedOrder);
         }
+
         public List<Order> getOrdersByUserEmail(String email) {
             User user = userRepository.findByEmail(email)
                     .orElseThrow(() -> new RuntimeException("User not found"));
