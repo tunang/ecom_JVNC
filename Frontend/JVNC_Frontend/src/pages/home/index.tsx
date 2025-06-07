@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { fetchGenresRequest } from '@/store/slices/genreSlice';
-import { fetchBooksRequest } from '@/store/slices/bookSlice';
+import { fetchBooksRequest, type Book } from '@/store/slices/bookSlice';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -24,8 +24,8 @@ const HomePage: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   
-  const { genres } = useAppSelector((state) => state.genre);
-  const { books, isLoading } = useAppSelector((state) => state.book);
+  const { genres, isLoading : isGenreLoading } = useAppSelector((state) => state.genre);
+  const { books, isLoading : isBookLoading } = useAppSelector((state) => state.book);
   
   useEffect(() => {
     // Fetch genres and books on component mount
@@ -33,24 +33,21 @@ const HomePage: React.FC = () => {
     dispatch(fetchBooksRequest({ page: 1, size: 20 }));
   }, [dispatch]);
 
-  // Group books by genre for display
-  const booksByGenre = genres.reduce((acc, genre) => {
-    acc[genre.genreId] = books.filter(book => book.genre?.genreId === genre.genreId).slice(0, 4);
-    return acc;
-  }, {} as Record<number, typeof books>);
+
 
   // Get featured books (first 8 books)
-  const featuredBooks = books.slice(0, 8);
-  
-  // Get random popular books
-  const popularBooks = books.slice(8, 16);
+// NEW CODE:
+const featuredBooks = Array.isArray(books) ? books.slice(0, 8) : [];
+const popularBooks = Array.isArray(books) ? books.slice(8, 16) : [];
 
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('vi-VN', {
-      style: 'currency',
-      currency: 'VND'
-    }).format(price);
-  };
+// Also update the booksByGenre logic:
+const booksByGenre = Array.isArray(genres) && genres.reduce((acc, genre) => {
+  const booksArray = Array.isArray(books) ? books : [];
+  acc[genre.genreId] = booksArray.filter(book => book.genre?.genreId === genre.genreId).slice(0, 4);
+  return acc;
+}, {} as Record<number, typeof books>);
+
+
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
@@ -142,7 +139,7 @@ const HomePage: React.FC = () => {
             </p>
           </div>
 
-          {isLoading ? (
+          {isBookLoading ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {[...Array(8)].map((_, index) => (
                 <div key={index} className="animate-pulse">
@@ -154,7 +151,7 @@ const HomePage: React.FC = () => {
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {featuredBooks.map((book) => (
+              {featuredBooks?.map((book) => (
                 <BookCard key={book.bookId} book={book} />
               ))}
             </div>
@@ -190,7 +187,7 @@ const HomePage: React.FC = () => {
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-12">
-            {genres.map((genre) => (
+            {Array.isArray(genres) && genres?.map((genre) => (
               <Card 
                 key={genre.genreId} 
                 className="cursor-pointer hover:shadow-lg transition-all duration-300 hover:scale-105 bg-gradient-to-br from-white to-gray-50"
@@ -213,7 +210,7 @@ const HomePage: React.FC = () => {
       </section>
 
       {/* Books by Category Sections */}
-      {genres.slice(0, 3).map((genre) => {
+      {Array.isArray(genres) && genres?.slice(0, 3).map((genre) => {
         const genreBooks = booksByGenre[genre.genreId];
         if (!genreBooks || genreBooks.length === 0) return null;
 
@@ -240,7 +237,7 @@ const HomePage: React.FC = () => {
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                {genreBooks.map((book) => (
+                {genreBooks.map((book : Book) => (
                   <BookCard key={book.bookId} book={book} />
                 ))}
               </div>
@@ -260,7 +257,7 @@ const HomePage: React.FC = () => {
       })}
 
       {/* Popular Books Section */}
-      {popularBooks.length > 0 && (
+      {!isBookLoading && popularBooks?.length > 0 && (
         <section className="py-16 bg-white">
           <div className="max-w-7xl mx-auto px-4">
             <div className="text-center mb-12">

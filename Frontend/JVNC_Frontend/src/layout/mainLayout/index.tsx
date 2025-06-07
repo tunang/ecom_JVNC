@@ -28,6 +28,7 @@ import { logoutRequest } from "@/store/slices/authSlice";
 import { useEffect } from "react";
 import { fetchGenresRequest } from "@/store/slices/genreSlice";
 import ScrollToTop from "@/components/ScrollToTop";
+import { useState } from "react";
 
 const MainLayout = () => {
   const dispatch = useAppDispatch();
@@ -36,6 +37,8 @@ const MainLayout = () => {
   const { user, isAuthenticated } = useAppSelector((state) => state.auth);
   const { genres } = useAppSelector((state) => state.genre);
   const { totalItems } = useAppSelector((state) => state.cart);
+  
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     dispatch(fetchGenresRequest({ page: 1, size: 10 }));
@@ -46,6 +49,18 @@ const MainLayout = () => {
   };
   const handleSignup = () => {
     console.log("Signup");
+  };
+
+  const handleSearch = () => {
+    if (searchQuery.trim()) {
+      navigate(`/search?title=${encodeURIComponent(searchQuery.trim())}`);
+    }
+  };
+
+  const handleSearchKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleSearch();
+    }
   };
 
   return (
@@ -71,7 +86,7 @@ const MainLayout = () => {
             </PopoverTrigger>
             <PopoverContent className="w-80 mt-2">
               <div className="grid grid-cols-3 gap-2">
-                {genres.map((genre) => (
+                {Array.isArray(genres) && genres?.map((genre) => (
                   <Link key={genre.genreId} to={`/genre/${genre.genreId}`}>
                     <Button variant="outline" size="sm" className="w-full text-xs">
                       {genre.name}
@@ -86,9 +101,12 @@ const MainLayout = () => {
               type="text" 
               placeholder="Tìm kiếm sách, tác giả..." 
               className="w-full"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              onKeyPress={handleSearchKeyPress}
             />
           </div>
-          <Button type="submit" variant="outline" size="icon">
+          <Button type="submit" variant="outline" size="icon" onClick={handleSearch}>
             <Search className="w-5 h-5" />
           </Button>
         </div>

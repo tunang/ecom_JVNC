@@ -23,6 +23,7 @@ export const ApiConstant = {
       getAll: '/books',
       getByGenre: '/books/genre/:genreId',
       getByID: '/books/:id',
+      search: '/books/search',
     },
 
     order:{

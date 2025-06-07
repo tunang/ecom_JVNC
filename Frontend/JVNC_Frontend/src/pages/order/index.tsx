@@ -29,6 +29,7 @@ import { toast } from 'sonner';
 import type { RootState } from '@/store';
 import { orderService } from '@/services/order.service';
 import type { Order } from '@/types/order.type';
+import { formatPrice } from '@/lib/utils';
 
 const OrdersPage: React.FC = () => {
   const navigate = useNavigate();
@@ -41,12 +42,7 @@ const OrdersPage: React.FC = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   // Format price function
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('vi-VN', {
-      style: 'currency',
-      currency: 'VND',
-    }).format(price);
-  };
+
 
   // Format date function
   const formatDate = (dateString: string) => {
@@ -142,7 +138,7 @@ const OrdersPage: React.FC = () => {
 
   // Redirect if not authenticated
   if (!isAuthenticated) {
-    return (
+    return ( 
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center max-w-md mx-auto px-4">
           <Package className="h-16 w-16 text-gray-400 mx-auto mb-4" />
@@ -168,9 +164,9 @@ const OrdersPage: React.FC = () => {
             </Button>
           </div>
         </div>
-      </div>
-    );
-  }
+        </div>
+     );
+}
 
   return (
     <div className="min-h-screen bg-gray-50">

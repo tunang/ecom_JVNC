@@ -17,4 +17,19 @@ export const orderService = {
     const response = await api.get(ApiConstant.order.getById.replace(':id', orderId.toString()));
     return response.data || response;
   },
+
+  // Admin functions
+  getAllOrdersAdmin: async (): Promise<Order[]> => {
+    const response = await api.get(ApiConstant.order.getAll);
+    return response.data || response;
+  },
+
+  updateOrder: async (orderId: number, orderData: Partial<Order>): Promise<Order> => {
+    const response = await api.put(ApiConstant.order.getById.replace(':id', orderId.toString()), orderData);
+    return response.data || response;
+  },
+
+  deleteOrder: async (orderId: number): Promise<void> => {
+    await api.delete(ApiConstant.order.getById.replace(':id', orderId.toString()));
+  },
 }; 
