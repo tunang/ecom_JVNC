@@ -55,7 +55,7 @@ const authSlice = createSlice({
     },
 
     // Register actions
-    registerRequest: (state, action: PayloadAction<{ email: string; name: string; phone: string; password: string; otp: string }>) => {
+    registerRequest: (state) => {
       state.isLoading = true;
       state.error = null;
     },
@@ -72,7 +72,7 @@ const authSlice = createSlice({
     },
 
     // OTP actions
-    sendOtpRequest: (state, action: PayloadAction<{ email: string }>) => {
+    sendOtpRequest: (state) => {
       state.isLoading = true;
       state.error = null;
     },

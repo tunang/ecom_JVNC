@@ -5,7 +5,6 @@ import {
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
-  SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
@@ -18,18 +17,10 @@ import {
 } from "@/components/ui/dropdown-menu";
 import {
   Book,
-  Calendar,
-  CassetteTape,
   ChevronUp,
   Home,
-  Inbox,
   List,
-  ListOrdered,
-  LucideListOrdered,
   Package,
-  Search,
-  Settings,
-  TypeIcon,
   User2,
 } from "lucide-react";
 import { useAppSelector } from "@/store/hooks";
@@ -65,7 +56,7 @@ const items = [
 ];
 
 export function AppSidebar() {
-  const {user, isAuthenticated} = useAppSelector((state) => state.auth);
+  const {user} = useAppSelector((state) => state.auth);
   return (
     <Sidebar collapsible="icon">
       <SidebarContent>

@@ -3,15 +3,15 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { Link, useNavigate } from 'react-router-dom';
 
-import { custom, z } from 'zod';
+import { z } from 'zod';
 
 import { useEffect, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { Eye, EyeOff, UserPlus } from 'lucide-react'; // Import icons
+import { Eye, EyeOff } from 'lucide-react'; // Import icons
 import { toast } from 'sonner';
 import { loginRequest, clearError } from '@/store/slices/authSlice';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';

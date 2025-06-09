@@ -28,8 +28,7 @@ const userSlice = createSlice({
   reducers: {
     // Fetch users actions (Admin only)
     fetchUsersRequest: (
-      state,
-      action: PayloadAction<{ page?: number; size?: number; search?: string }>
+      state
     ) => {
       state.isLoading = true;
       state.error = null;
@@ -50,7 +49,7 @@ const userSlice = createSlice({
     },
 
     // Fetch single user actions
-    fetchUserByIdRequest: (state, action: PayloadAction<number>) => {
+    fetchUserByIdRequest: (state) => {
       state.isLoading = true;
       state.error = null;
     },
@@ -63,7 +62,7 @@ const userSlice = createSlice({
       state.isLoading = false;
       state.error = action.payload;
     },
-    createUserRequest: (state, action: PayloadAction<{ user: Partial<User> }>) => {
+    createUserRequest: (state) => {
       state.isLoading = true;
       state.error = null;
     },
@@ -76,10 +75,7 @@ const userSlice = createSlice({
       state.error = action.payload;
     },
     // Update user actions
-    updateUserRequest: (
-      state,
-      action: PayloadAction<{ id: number; user: Partial<User> }>
-    ) => {
+    updateUserRequest: (state) => {
       state.isLoading = true;
       state.error = null;
     },
@@ -102,8 +98,7 @@ const userSlice = createSlice({
     },
 
     // Delete user actions (Admin only)
-    deleteUserRequest: (state, action: PayloadAction<{ userId: number }>) => {
-      console.log(action);
+    deleteUserRequest: (state) => {
       state.isLoading = true;
       state.error = null;
     },
@@ -133,7 +128,7 @@ const userSlice = createSlice({
     },
 
     // Update profile actions (for authenticated user)
-    updateProfileRequest: (state, action: PayloadAction<any>) => {
+    updateProfileRequest: (state) => {
       state.isLoading = true;
       state.error = null;
     },
