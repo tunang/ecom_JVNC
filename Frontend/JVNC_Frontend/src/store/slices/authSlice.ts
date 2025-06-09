@@ -96,7 +96,6 @@ const authSlice = createSlice({
       state.isAuthenticated = false;
       state.isLoading = false;
       state.error = null;
-      state.cart = null;
       localStorage.removeItem('token');
     },
     logoutFailure: (state, action: PayloadAction<string>) => {

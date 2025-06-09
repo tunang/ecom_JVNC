@@ -75,7 +75,7 @@ const getStatusBadge = (status: Order['status']) => {
 
 export const columns: ColumnDef<Order>[] = [
   {
-    accessorKey: "id",
+    accessorKey: "orderId",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="ID" />
     ),
@@ -86,6 +86,15 @@ export const columns: ColumnDef<Order>[] = [
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="User ID" />
     ),
+    cell: ({ row }) => {
+      console.log(row.original);
+      const userId = row.original.user?.userId;
+      return (
+        <span className="font-medium text-blue-600">
+            {userId}
+        </span>
+      );
+    },
     size: 100,
   },
   {

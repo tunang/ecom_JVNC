@@ -15,6 +15,8 @@ const Orders = () => {
       setIsLoading(true);
       const fetchedOrders = await orderService.getAllOrdersAdmin();
       setOrders(Array.isArray(fetchedOrders) ? fetchedOrders : []);
+
+      console.log(fetchedOrders);
     } catch (error: any) {
       console.error('Failed to fetch orders:', error);
       toast.error('Không thể tải danh sách đơn hàng');

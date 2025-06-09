@@ -78,7 +78,7 @@ const booksByGenre = Array.isArray(genres) && genres.reduce((acc, genre) => {
             <Button 
               size="lg" 
               variant="outline"
-              className="border-white text-white hover:bg-white hover:text-blue-600 px-8 py-3 text-lg font-semibold"
+              className="border-white text-black hover:bg-white hover:text-blue-600 px-8 py-3 text-lg font-semibold"
               onClick={() => navigate('/cart')}
             >
               <Heart className="mr-2 h-5 w-5" />

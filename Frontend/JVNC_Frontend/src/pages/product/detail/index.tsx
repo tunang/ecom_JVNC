@@ -126,7 +126,7 @@ const ProductDetail: React.FC = () => {
   const StockIcon = stockStatus.icon;
 
   // Mock data for demonstration
-  const relatedBooksFiltered = relatedBooks.filter(b => b.bookId !== book.bookId).slice(0, 5);
+  const relatedBooksFiltered = relatedBooks.filter(b => b.bookId !== book.bookId).slice(0, 4);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -160,13 +160,13 @@ const ProductDetail: React.FC = () => {
           <div className="space-y-4">
             <div className="aspect-[3/4] rounded-lg overflow-hidden bg-white shadow-lg">
               <img
-                src={book.imageUrl[selectedImage] || book.imageUrl}
+                src={book.imageUrl}
                 alt={book.title}
                 className="w-full h-full object-cover"
-                onError={(e) => {
-                  const target = e.target as HTMLImageElement;
-                  target.src = 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=600';
-                }}
+                // onError={(e) => {
+                //   const target = e.target as HTMLImageElement;
+                //   target.src = 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=600';
+                // }}
               />
             </div>
             {/* {book.imageUrl.length > 1 && (

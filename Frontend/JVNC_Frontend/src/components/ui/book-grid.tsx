@@ -21,7 +21,7 @@ const BookGrid: React.FC<BookGridProps> = ({
 }) => {
   if (loading) {
     return (
-      <div className={`grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 ${className}`}>
+      <div className={`grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-6 ${className}`}>
         {[...Array(10)].map((_, index) => (
           <div key={index} className="animate-pulse">
             <div className="aspect-[3/4] bg-gray-200 rounded-t-lg"></div>
@@ -67,12 +67,12 @@ const BookGrid: React.FC<BookGridProps> = ({
   }
 
   return (
-    <div className={`grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 ${className}`}>
+    <div className={`grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-6 ${className}`}>
       {books.map((book) => (
         <BookCard
           key={book.bookId}
           book={book}
-          onAddToCart={onAddToCart}
+          // onAddToCart={onAddToCart}
           onToggleFavorite={onToggleFavorite}
           isFavorite={favoriteBooks.includes(book.bookId)}
         />

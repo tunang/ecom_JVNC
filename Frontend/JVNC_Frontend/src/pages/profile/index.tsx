@@ -36,6 +36,7 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
+import { formatDate } from '@/lib/utils';
 
 const profileSchema = z.object({
   name: z.string().min(1, 'Tên không được để trống'),
@@ -78,13 +79,7 @@ const Profile: React.FC = () => {
     }
   }, [user, form]);
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('vi-VN', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    });
-  };
+
 
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];

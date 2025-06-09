@@ -3,6 +3,7 @@ import axios from 'axios';
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL,
   headers: {
+    "ngrok-skip-browser-warning": "*",
     'Content-Type': 'application/json',
   },
 });
@@ -55,6 +56,7 @@ apiDefaultUpload.interceptors.response.use(
 const apiTempUpload = axios.create({
   baseURL: import.meta.env.VITE_UPLOAD_API_BASE_URL,
   headers: {
+    "ngrok-skip-browser-warning": "*",
     'Content-Type': 'multipart/form-data',
   },
 });

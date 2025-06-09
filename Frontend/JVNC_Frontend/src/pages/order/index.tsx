@@ -29,7 +29,7 @@ import { toast } from 'sonner';
 import type { RootState } from '@/store';
 import { orderService } from '@/services/order.service';
 import type { Order } from '@/types/order.type';
-import { formatPrice } from '@/lib/utils';
+import { formatDate, formatPrice } from '@/lib/utils';
 
 const OrdersPage: React.FC = () => {
   const navigate = useNavigate();
@@ -45,15 +45,7 @@ const OrdersPage: React.FC = () => {
 
 
   // Format date function
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('vi-VN', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-  };
+
 
   // Get status info (color, icon, text)
   const getStatusInfo = (status: Order['status']) => {

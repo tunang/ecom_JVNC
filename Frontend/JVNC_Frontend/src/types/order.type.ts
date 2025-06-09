@@ -1,4 +1,5 @@
 import type { Book } from './book.type';
+import type { User } from './user.type';
 
 export interface OrderItem {
   bookId: number;
@@ -21,6 +22,7 @@ export interface Order {
   createdAt: string;
   updatedAt: string;
   userId?: number;
+  user?: User;
 }
 
 export interface OrderListResponse {
