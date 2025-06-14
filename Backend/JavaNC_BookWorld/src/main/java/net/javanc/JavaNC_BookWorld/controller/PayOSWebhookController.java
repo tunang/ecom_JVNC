@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/api/webhook/payos")
 public class PayOSWebhookController {
@@ -28,40 +30,38 @@ public class PayOSWebhookController {
         try {
             if (!webhookVerifier.verifySignature(webhookRequest)) {
                 logger.error("Invalid signature for webhook: {}", webhookRequest.getOrderCode());
-                return ResponseEntity.badRequest().body("Invalid signature");
+                return ResponseEntity.badRequest().body(Map.of("success", false, "message", "Invalid signature"));
             }
 
             String status = webhookRequest.getStatus();
+            Long orderCode = Long.valueOf(webhookRequest.getOrderCode());
 
-            // Xử lý trạng thái thanh toán
-            if ("Paid".equalsIgnoreCase(status) || "Success".equalsIgnoreCase(status)) {
-                orderService.updateOrderStatusByOrderCode(
-                        Long.valueOf(webhookRequest.getOrderCode()),
-                        "PAID"
-                );
-                logger.info("Order {} marked as PAID", webhookRequest.getOrderCode());
-            } else if ("Pending".equalsIgnoreCase(status)) {
-                orderService.updateOrderStatusByOrderCode(
-                        Long.valueOf(webhookRequest.getOrderCode()),
-                        "PENDING"
-                );
-                logger.info("Order {} marked as PENDING", webhookRequest.getOrderCode());
-            } else if ("Failed".equalsIgnoreCase(status) || "Cancelled".equalsIgnoreCase(status)) {
-                orderService.updateOrderStatusByOrderCode(
-                        Long.valueOf(webhookRequest.getOrderCode()),
-                        "FAILED"
-                );
-                logger.info("Order {} marked as FAILED", webhookRequest.getOrderCode());
-            } else {
-                logger.warn("Received unknown status '{}' for order {}", status, webhookRequest.getOrderCode());
-                // Có thể xử lý mặc định hoặc bỏ qua
+            switch (status.toUpperCase()) {
+                case "PAID":
+                case "SUCCESS":
+                    orderService.updateOrderStatusByOrderCode(orderCode, "PAID");
+                    logger.info("Order {} marked as PAID", orderCode);
+                    break;
+                case "PENDING":
+                    orderService.updateOrderStatusByOrderCode(orderCode, "PENDING");
+                    logger.info("Order {} marked as PENDING", orderCode);
+                    break;
+                case "FAILED":
+                    orderService.updateOrderStatusByOrderCode(orderCode, "FAILED");
+                    logger.info("Order {} marked as FAILED", orderCode);
+                    break;
+                case "CANCELLED":
+                    orderService.updateOrderStatusByOrderCode(orderCode, "CANCELED");
+                    logger.info("Order {} marked as CANCELED", orderCode);
+                    break;
+                default:
+                    logger.warn("Unknown status '{}' for order {}", status, orderCode);
             }
 
-            logger.info("Webhook processed successfully for orderCode={}", webhookRequest.getOrderCode());
-            return ResponseEntity.ok("Webhook processed successfully");
+            return ResponseEntity.ok(Map.of("success", true));
         } catch (Exception e) {
             logger.error("Error processing webhook: {}", e.getMessage(), e);
-            return ResponseEntity.badRequest().body("Error processing webhook: " + e.getMessage());
+            return ResponseEntity.status(500).body(Map.of("success", false, "message", e.getMessage()));
         }
     }
 }

@@ -25,7 +25,7 @@ public class PayOSWebhookVerifier {
     @Autowired
     private ObjectMapper objectMapper;
 
-    /*public boolean verifySignature(PayOSWebhookRequest webhookRequest) {
+    public boolean verifySignature(PayOSWebhookRequest webhookRequest) {
         if (webhookRequest == null || webhookRequest.getData() == null
                 || webhookRequest.getOrderCode() == null || webhookRequest.getStatus() == null
                 || webhookRequest.getSignature() == null) {
@@ -59,11 +59,7 @@ public class PayOSWebhookVerifier {
             logger.error("Unexpected error during signature verification", e);
             return false;
         }
-    }*/
-    public boolean verifySignature(PayOSWebhookRequest webhookRequest) {
-        return true;
     }
-
     private String bytesToHex(byte[] hash) {
         StringBuilder hexString = new StringBuilder(2 * hash.length);
         for (byte b : hash) {
