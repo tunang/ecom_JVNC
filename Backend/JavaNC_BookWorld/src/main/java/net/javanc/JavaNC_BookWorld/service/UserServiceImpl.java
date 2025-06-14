@@ -60,6 +60,7 @@ public class UserServiceImpl implements UserService {
         if (dto.getPhone() != null && !dto.getPhone().trim().isEmpty()) {
             user.setPhone(dto.getPhone().trim());
         }
+        
         if (dto.getRole() != null && !dto.getRole().trim().isEmpty()) {
             user.setRole(dto.getRole().trim());
         }
