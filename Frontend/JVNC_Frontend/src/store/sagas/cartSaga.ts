@@ -19,6 +19,7 @@ import {
 } from '../slices/cartSlice';
 import { api } from '../../services/api.service';
 import type { SagaIterator } from 'redux-saga';
+import { ApiConstant } from '@/constants/api.constant';
 
 // Fetch cart items saga
 function* fetchCartItemsSaga():SagaIterator {
@@ -78,7 +79,7 @@ function* removeFromCartSaga(action: PayloadAction<number>):SagaIterator {
 // Clear cart saga
 function* clearCartSaga():SagaIterator {
   try {
-    yield call(api.delete, '/cart');
+    yield call(api.delete, ApiConstant.cart.clear);
 
     yield put(clearCartSuccess());
   } catch (error: any) {

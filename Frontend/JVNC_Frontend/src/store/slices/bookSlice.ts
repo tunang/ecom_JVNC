@@ -27,7 +27,7 @@ const bookSlice = createSlice({
   initialState,
   reducers: {
     // Fetch books actions
-    fetchBooksRequest: (state) => {
+    fetchBooksRequest: (state, action: PayloadAction<{ page?: number; size?: number; search?: string }>) => {
       state.isLoading = true;
       state.error = null;
     },
@@ -44,7 +44,7 @@ const bookSlice = createSlice({
     },
 
     // Fetch single book actions
-    fetchBookByIdRequest: (state) => {
+    fetchBookByIdRequest: (state, action: PayloadAction<number>) => {
       state.isLoading = true;
       state.error = null;
     },
@@ -58,7 +58,7 @@ const bookSlice = createSlice({
       state.error = action.payload;
     },
 
-    fetchBooksByGenreRequest: (state) => {
+    fetchBooksByGenreRequest: (state, action: PayloadAction<{ genreId: number }>) => {
       state.isLoading = true;
       state.error = null;
     },
@@ -77,7 +77,7 @@ const bookSlice = createSlice({
 
 
     // Create book actions (Admin only)
-    createBookRequest: (state) => {
+    createBookRequest: (state, action: PayloadAction<any>) => {
       state.isLoading = true;
       state.error = null;
     },
@@ -93,7 +93,7 @@ const bookSlice = createSlice({
     },
 
     // Update book actions (Admin only)
-    updateBookRequest: (state) => {
+    updateBookRequest: (state, action: PayloadAction<{ id: number; book: any }>) => {
       state.isLoading = true;
       state.error = null;
     },
@@ -114,7 +114,7 @@ const bookSlice = createSlice({
     },
 
     // Delete book actions (Admin only)
-    deleteBookRequest: (state) => {
+    deleteBookRequest: (state, action: PayloadAction<{ bookId: number }>) => {
       state.isLoading = true;
       state.error = null;
     },

@@ -11,12 +11,16 @@ export interface OrderItem {
 export interface CreateOrderRequest {
   orderItems: OrderItem[];
   address: string;
+  phone: string;
 }
 
 export interface Order {
   id: number;
+  orderId?: string;
   orderItems: OrderItem[];
   address: string;
+  phone: string;
+  paymentUrl: string;
   totalAmount: number;
   status: 'PENDING' | 'CONFIRMED' | 'SHIPPING' | 'DELIVERED' | 'CANCELLED';
   createdAt: string;

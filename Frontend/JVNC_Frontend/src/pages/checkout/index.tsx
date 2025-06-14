@@ -26,6 +26,7 @@ const Checkout: React.FC = () => {
   
   const [isLoading, setIsLoading] = useState(false);
   const [address, setAddress] = useState('');
+  const [phone, setPhone] = useState('');
   const [errors, setErrors] = useState<{[key: string]: string}>({});
 
   
@@ -38,6 +39,12 @@ const Checkout: React.FC = () => {
       newErrors.address = 'Vui lòng nhập địa chỉ giao hàng';
     } else if (address.trim().length < 10) {
       newErrors.address = 'Địa chỉ phải có ít nhất 10 ký tự';
+    }
+
+    if (!phone.trim()) {
+      newErrors.phone = 'Vui lòng nhập số điện thoại';
+    } else if (!/^\d{10}$/.test(phone.trim())) {
+      newErrors.phone = 'Số điện thoại phải có 10 chữ số';
     }
 
     setErrors(newErrors);
@@ -66,7 +73,8 @@ const Checkout: React.FC = () => {
           quantity: item.quantity,
           price: item.book.price
         })),
-        address: address.trim()
+        address: address.trim(),
+        phone: phone.trim()
       };
 
       // Create order via API
@@ -199,7 +207,7 @@ const Checkout: React.FC = () => {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
-                  <Label htmlFor="address">Địa chỉ chi tiết *</Label>
+                  <Label className='mb-2' htmlFor="address">Địa chỉ chi tiết *</Label>
                   <Textarea
                     id="address"
                     placeholder="Nhập địa chỉ giao hàng chi tiết (số nhà, đường, phường/xã, quận/huyện, tỉnh/thành phố)..."
@@ -216,6 +224,22 @@ const Checkout: React.FC = () => {
                     <div className="flex items-center gap-2 mt-2 text-red-600 text-sm">
                       <AlertCircle className="h-4 w-4" />
                       <span>{errors.address}</span>
+                    </div>
+                  )}
+                </div>
+                <div>
+                  <Label className='mb-2' htmlFor="phone">Số điện thoại *</Label>
+                  <Input
+                    id="phone"
+                    placeholder="Nhập số điện thoại"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    className={`${errors.phone ? 'border-red-500' : ''} `}
+                  />
+                  {errors.phone && (
+                    <div className="flex items-center gap-2 mt-2 text-red-600 text-sm">
+                      <AlertCircle className="h-4 w-4" />
+                      <span>{errors.phone}</span>
                     </div>
                   )}
                 </div>

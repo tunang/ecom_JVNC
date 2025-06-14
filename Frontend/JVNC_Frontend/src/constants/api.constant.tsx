@@ -30,6 +30,10 @@ export const ApiConstant = {
       create: '/orders',
       getAll: '/orders',
       getById: '/orders/:id',
+    },
+    
+    cart:{
+      clear: '/cart/clear',
     }
 
   };

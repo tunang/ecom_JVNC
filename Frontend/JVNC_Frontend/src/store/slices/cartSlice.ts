@@ -48,7 +48,7 @@ const cartSlice = createSlice({
     },
 
     // Add item to cart actions
-    addToCartRequest: (state) => {
+    addToCartRequest: (state, action: PayloadAction<{ bookId: number; quantity: number }>) => {
       state.isLoading = true;
       state.error = null;
     },
@@ -73,7 +73,7 @@ const cartSlice = createSlice({
     },
 
     // Update cart item quantity actions
-    updateCartItemRequest: (state) => {
+    updateCartItemRequest: (state, action: PayloadAction<{ itemId: number; quantity: number }>) => {
       state.isLoading = true;
       state.error = null;
     },
@@ -96,7 +96,7 @@ const cartSlice = createSlice({
     },
 
     // Remove item from cart actions
-    removeFromCartRequest: (state) => {
+    removeFromCartRequest: (state, action: PayloadAction<number>) => {
       state.isLoading = true;
       state.error = null;
     },

@@ -37,7 +37,6 @@ function* initializeAuthSaga(): SagaIterator {
   try {
     const token = localStorage.getItem('token');
     if (token) {
-      // Try to fetch current user data to validate the token
       const user: any = yield call(api.get, '/users/me');
       yield put(setAuthUser(user));
       
