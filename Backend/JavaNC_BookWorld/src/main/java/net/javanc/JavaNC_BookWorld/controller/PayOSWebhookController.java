@@ -1,67 +1,52 @@
 package net.javanc.JavaNC_BookWorld.controller;
 
-import net.javanc.JavaNC_BookWorld.dto.PayOSWebhookRequest;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import net.javanc.JavaNC_BookWorld.service.OrderService;
-import net.javanc.JavaNC_BookWorld.service.PayOSWebhookVerifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Map;
+import vn.payos.PayOS;
+import vn.payos.type.Webhook;
+import vn.payos.type.WebhookData;
 
 @RestController
-@RequestMapping("/api/webhook/payos")
+@RequestMapping("/api/webhook")
 public class PayOSWebhookController {
 
     private static final Logger logger = LoggerFactory.getLogger(PayOSWebhookController.class);
 
     @Autowired
-    private OrderService orderService;
+    private PayOS payOS;
 
     @Autowired
-    private PayOSWebhookVerifier webhookVerifier;
+    private OrderService orderService;
 
-    @PostMapping
-    public ResponseEntity<?> handleWebhook(@RequestBody PayOSWebhookRequest webhookRequest) {
-        logger.info("Received webhook: orderCode={}, status={}",
-                webhookRequest.getOrderCode(), webhookRequest.getStatus());
+    @PostMapping("/payos")
+    public ObjectNode handleWebhook(@RequestBody ObjectNode body) {
+        ObjectMapper mapper = new ObjectMapper();
+        ObjectNode response = mapper.createObjectNode();
+
         try {
-            if (!webhookVerifier.verifySignature(webhookRequest)) {
-                logger.error("Invalid signature for webhook: {}", webhookRequest.getOrderCode());
-                return ResponseEntity.badRequest().body(Map.of("success", false, "message", "Invalid signature"));
-            }
+            Webhook webhookBody = mapper.treeToValue(body, Webhook.class);
+            WebhookData data = payOS.verifyPaymentWebhookData(webhookBody);
 
-            String status = webhookRequest.getStatus();
-            Long orderCode = Long.valueOf(webhookRequest.getOrderCode());
+            logger.info("✅ Webhook xác thực thành công: orderCode={}", data.getOrderCode());
 
-            switch (status.toUpperCase()) {
-                case "PAID":
-                case "SUCCESS":
-                    orderService.updateOrderStatusByOrderCode(orderCode, "PAID");
-                    logger.info("Order {} marked as PAID", orderCode);
-                    break;
-                case "PENDING":
-                    orderService.updateOrderStatusByOrderCode(orderCode, "PENDING");
-                    logger.info("Order {} marked as PENDING", orderCode);
-                    break;
-                case "FAILED":
-                    orderService.updateOrderStatusByOrderCode(orderCode, "FAILED");
-                    logger.info("Order {} marked as FAILED", orderCode);
-                    break;
-                case "CANCELLED":
-                    orderService.updateOrderStatusByOrderCode(orderCode, "CANCELED");
-                    logger.info("Order {} marked as CANCELED", orderCode);
-                    break;
-                default:
-                    logger.warn("Unknown status '{}' for order {}", status, orderCode);
-            }
+            // Xử lý đơn hàng tại đây
+            orderService.markOrderAsPaid(data.getOrderCode());
 
-            return ResponseEntity.ok(Map.of("success", true));
+            response.put("error", 0);
+            response.put("message", "Webhook delivered");
+            response.set("data", null);
         } catch (Exception e) {
-            logger.error("Error processing webhook: {}", e.getMessage(), e);
-            return ResponseEntity.status(500).body(Map.of("success", false, "message", e.getMessage()));
+            logger.warn("❌ Webhook xác thực thất bại: {}", e.getMessage());
+            response.put("error", -1);
+            response.put("message", e.getMessage());
+            response.set("data", null);
         }
+
+        return response;
     }
 }

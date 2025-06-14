@@ -15,6 +15,7 @@
     import java.time.LocalDateTime;
     import java.util.ArrayList;
     import java.util.List;
+    import java.util.Optional;
 
     @Service
     public class OrderService {
@@ -34,7 +35,9 @@
         public Order createOrder(OrderRequest orderRequest, String email) {
             User user = userRepository.findByEmail(email)
                     .orElseThrow(() -> new RuntimeException("User not found"));
-
+            if (orderRequest.getOrderItems() == null || orderRequest.getOrderItems().isEmpty()) {
+                throw new RuntimeException("Order items cannot be empty");
+            }
             // Tạo đơn hàng
             Order order = new Order();
             order.setUser(user);
@@ -66,6 +69,8 @@
 
             // Lưu đơn hàng để lấy orderId
             Order savedOrder = orderRepository.save(order);
+
+            savedOrder.setOrderCode(savedOrder.getOrderId());
 
             // Tạo link thanh toán
             String paymentUrl = createPaymentLink(savedOrder);
@@ -141,5 +146,21 @@
             }
 
             orderRepository.save(order);
+        }
+        public void markOrderAsPaid(long orderCode) {
+            Optional<Order> optionalOrder = orderRepository.findByOrderCode(orderCode);
+
+            if (optionalOrder.isPresent()) {
+                Order order = optionalOrder.get();
+                if (!order.getStatus().equalsIgnoreCase("PAID")) {
+                    order.setStatus("PAID");
+                    orderRepository.save(order);
+                    System.out.println("✅ Đã cập nhật trạng thái PAID cho đơn hàng " + orderCode);
+                } else {
+                    System.out.println("ℹ️ Đơn hàng " + orderCode + " đã được thanh toán trước đó.");
+                }
+            } else {
+                System.out.println("❌ Không tìm thấy đơn hàng với orderCode: " + orderCode);
+            }
         }
     }

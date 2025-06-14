@@ -38,6 +38,8 @@ public class Order {
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
     private List<OrderItem> orderItems = new ArrayList<>();
+    @Column(name = "order_code", unique = true)
+    private Long orderCode;
 
     // Constructor
     public Order() {
@@ -115,6 +117,14 @@ public class Order {
 
     public void setPaymentUrl(String paymentUrl) {
         this.paymentUrl = paymentUrl;
+    }
+
+    public Long getOrderCode() {
+        return orderCode;
+    }
+
+    public void setOrderCode(Long orderCode) {
+        this.orderCode = orderCode;
     }
 }
 
